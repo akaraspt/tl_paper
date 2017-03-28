@@ -78,6 +78,9 @@ def train_mlp(db, n_layers, lr, n_epochs):
             valid_loss, valid_acc = sess.run([cost, acc], feed_dict=feed_dict)
             print("   val loss: %f" % valid_loss)
             print("   val acc: %f" % valid_acc)
+            
+            db.train_log({'loss': train_loss, 'acc': train_acc, 'time': datetime.utcnow()})
+            db.valid_log({'loss': valid_loss, 'acc': valid_acc, 'time': datetime.utcnow()})
 
     print('Evaluation')
     dp_dict = tl.utils.dict_to_one(network.all_drop)
@@ -86,7 +89,11 @@ def train_mlp(db, n_layers, lr, n_epochs):
     test_loss, test_acc = sess.run([cost, acc], feed_dict=feed_dict)
     print("   test loss: %f" % test_loss)
     print("   test acc: %f" % test_acc)
-
+    
+    db.test_log({'loss': test_loss, 'acc': test_acc, 'time': datetime.utcnow()})
+    db.save_params(params=sess.run(network.all_params))
+    
+    
     # In the end, close TensorFlow session.
     sess.close()
     tl.layers.clear_layers_name()
@@ -176,6 +183,10 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
             print("   val loss: %f" % (val_loss / n_batch))
             print("   val acc: %f" % (val_acc / n_batch))
 
+            db.train_log({'loss': train_lossn_batch/n_batch, 'acc': train_acc/n_batch, 'time': datetime.utcnow()})
+            db.valid_log({'loss': val_loss/n_batch, 'acc': val_acc/n_batch, 'time': datetime.utcnow()})
+
+            
     print('Evaluation')
     test_loss, test_acc, n_batch = 0, 0, 0
     for X_test_a, y_test_a in tl.iterate.minibatches(
@@ -190,6 +201,10 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     print("   test loss: %f" % (test_loss / n_batch))
     print("   test acc: %f" % (test_acc / n_batch))
 
+    db.test_log({'loss': test_loss/n_batch, 'acc': test_acc/n_batch, 'time': datetime.utcnow()})
+    db.save_params(params=sess.run(network.all_params))
+        
+    
     # In the end, close TensorFlow session.
     sess.close()
     tl.layers.clear_layers_name()
