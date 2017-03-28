@@ -1,12 +1,20 @@
+
+# coding: utf-8
+
+# In[1]:
+
 #! /usr/bin/python
-# -*- coding: utf8 -*-
+
+from __future__ import print_function
+
 import tensorflow as tf
 import tensorlayer as tl
-from . import iterate
 import numpy as np
 import time
 import math
 
+
+import uuid
 
 import pymongo
 import gridfs
@@ -54,16 +62,23 @@ class TensorDB(object):
         db_name = 'db_name',
         user_name = None,
         password = 'password',
+        studyID=None
     ):
         ## connect mongodb
         client = MongoClient(ip, port)
         self.db = client[db_name]
         if user_name != None:
             self.db.authenticate(user_name, password)
+            
+        if studyID is None:
+            self.studyID=str(uuid.uuid1())
+        else:
+            self.studyID = studyID
         ## define file system (Buckets)
         self.datafs = gridfs.GridFS(self.db, collection="datafs")
         self.modelfs = gridfs.GridFS(self.db, collection="modelfs")
         self.paramsfs = gridfs.GridFS(self.db, collection="paramsfs")
+        self.archfs=gridfs.GridFS(self.db,collection="ModelArchitecture")
         ##
         print("[TensorDB] Connect SUCCESS {}:{} {} {}".format(ip, port, db_name, user_name))
 
@@ -151,6 +166,15 @@ class TensorDB(object):
     # def del_model(self):
     #     pass
 
+    def __autofill(self,args):
+        return args.update({'studyID':self.studyID})
+    
+    def __serialization(self,ps):
+        return pickle.dumps(ps, protocol=2)
+    
+    def __deserialization(self,ps):
+        return pickle.loads(ps)
+    
     def save_params(self, params=[], args={}):#, file_name='parameters'):
         """ Save parameters into MongoDB Buckets, and save the file ID into Params Collections.
 
@@ -163,9 +187,12 @@ class TensorDB(object):
         ---------
         f_id : the Buckets ID of the parameters.
         """
+        
+        self.__autofill(args)
         s = time.time()
-        f_id = self.paramsfs.put(pickle.dumps(params, protocol=2))#, file_name=file_name)
+        f_id = self.paramsfs.put(self.__serialization(params))#, file_name=file_name)
         args.update({'f_id': f_id, 'time': datetime.utcnow()})
+        print(args)
         self.db.Params.insert_one(args)
         # print("[TensorDB] Save params: {} SUCCESS, took: {}s".format(file_name, round(time.time()-s, 2)))
         print("[TensorDB] Save params: SUCCESS, took: {}s".format(round(time.time()-s, 2)))
@@ -183,6 +210,7 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
         f_id : the Buckets ID of the parameters, return False if nothing found.
         """
+        self.__autofill(args)
         s = time.time()
         d = self.db.Params.find_one(args)
 
@@ -192,7 +220,7 @@ class TensorDB(object):
             print("[TensorDB] FAIL! Cannot find: {}".format(args))
             return False, False
         try:
-            params = pickle.loads(self.paramsfs.get(f_id).read())
+            params = self.__deserialization(self.paramsfs.get(f_id).read())
             print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))
             return params, f_id
         except:
@@ -208,7 +236,10 @@ class TensorDB(object):
         Returns
         --------
         params : the parameters, return False if nothing found.
+        
         """
+        self.__autofill(args)
+        
         s = time.time()
         pc = self.db.Params.find(args)
 
@@ -217,7 +248,7 @@ class TensorDB(object):
             params = []
             for f_id in f_id_list: # you may have multiple Buckets files
                 tmp = self.paramsfs.get(f_id).read()
-                params.append(pickle.loads(tmp))
+                params.append(self.__deserialization(tmp))
         else:
             print("[TensorDB] FAIL! Cannot find any: {}".format(args))
             return False
@@ -232,6 +263,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all parameters.
         """
+        self.__autofill(args)
         pc = self.db.Params.find(args)
         f_id_list = pc.distinct('f_id')
         # remove from Buckets
@@ -244,6 +276,7 @@ class TensorDB(object):
 
     def _print_dict(self, args):
         # return " / ".join(str(key) + ": "+ str(value) for key, value in args.items())
+        self.__autofill(args)
         string = ''
         for key, value in args.items():
             if key is not '_id':
@@ -269,6 +302,7 @@ class TensorDB(object):
         >>> import _your_script
         ... running your script
         """
+        self.__autofill(args)
         if script is not None:
             _script = open(script, 'rb').read()
             args.update({'script': _script, 'script_name': script})
@@ -289,6 +323,8 @@ class TensorDB(object):
         --------
         dictionary : contains all meta data and script.
         """
+        
+        self.__autofill(args)
         temp = self.db.Job.find_one(args)
 
         if temp is not None:
@@ -303,13 +339,14 @@ class TensorDB(object):
         
         return temp
 
-    def get_all_jobs(self):
+    def get_all_jobs(self, args={}):
         """ Get all parameter from MongoDB Buckets
-
         Returns
         --------
         params : the parameters, return False if nothing found.
         """
+        self.__autofill(args)
+
         s = time.time()
         cursor = self.db.Job.find({})
 
@@ -335,6 +372,7 @@ class TensorDB(object):
         ---------
         >>> db.train_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
+        self.__autofill(args)
         _result = self.db.TrainLog.insert_one(args)
         _log = self._print_dict(args)
         print("[TensorDB] TrainLog: " +_log)
@@ -347,6 +385,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all log.
         """
+        self.__autofill(args)
         self.db.TrainLog.delete_many(args)
         print("[TensorDB] Delete TrainLog SUCCESS")
 
@@ -361,6 +400,7 @@ class TensorDB(object):
         ---------
         >>> db.valid_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
+        self.__autofill(args)
         _result = self.db.ValidLog.insert_one(args)
         # _log = "".join(str(key) + ": " + str(value) for key, value in args.items())
         _log = self._print_dict(args)
@@ -374,6 +414,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all log.
         """
+        self.__autofill(args)
         self.db.ValidLog.delete_many(args)
         print("[TensorDB] Delete ValidLog SUCCESS")
 
@@ -388,6 +429,7 @@ class TensorDB(object):
         ---------
         >>> db.test_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
+        self.__autofill(args)
         _result = self.db.TestLog.insert_one(args)
         # _log = "".join(str(key) + str(value) for key, value in args.items())
         _log = self._print_dict(args)
@@ -401,6 +443,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all log.
         """
+        self.__autofill(args)
         self.db.TestLog.delete_many(args)
         print("[TensorDB] Delete TestLog SUCCESS")
 
@@ -408,69 +451,33 @@ class TensorDB(object):
         _s = "[TensorDB] Info:\n"
         _t = _s + "    " + str(self.db)
         return _t
+        
+    
+    def save_model_architecture(self,s,args):
+        self.__autofill(args)
+        fid=self.archfs.put(s,filename="modelarchitecture")
+        args.update({"fid":fid})
+        self.db.march.insert_one(args)
+        
+     
+    def load_model_architecture(self,args):
+        self.__autofill(args)
+        d = self.db.march.find_one(args)
+        if d is not None:
+            fid = d['fid']
+            print (d)
+            print (fid)
+            "print find"
+        else:
+            print("[TensorDB] FAIL! Cannot find: {}".format(args))
+            print ("no idtem")
+            return False, False
+        try:
+            archs = self.archfs.get(fid).read()
+            '''print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))'''
+            return archs, fid
+        except Exception as e:
+            print ("exception")
+            print (e)
+            return False, False
 
-
-
-
-
-if __name__ == '__main__':
-
-    db = TensorDB(ip='localhost', port=27017, db_name='mnist', user_name=None, password=None)
-
-    db.save_job('your_script.py', {'job_id': 1, 'learning_rate': 0.01, 'n_units': 100})
-    temp = db.find_one_job(args={'job_id': 1})
-
-    print(temp['learning_rate'])
-
-    import _your_script
-    print("import _your_script SUCCESS")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#

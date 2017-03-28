@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import numpy as np
+from datetime import datetime
 import tensorflow as tf
 import tensorlayer as tl
 from tensorlayer.db import TensorDB
@@ -91,7 +92,7 @@ def train_mlp(db, n_layers, lr, n_epochs):
     print("   test acc: %f" % test_acc)
     
     db.test_log({'loss': test_loss, 'acc': test_acc, 'time': datetime.utcnow()})
-    db.save_params(params=sess.run(network.all_params))
+    db.save_params(params=sess.run(network.all_params), args={'type': 'model_mlp'})
     
     
     # In the end, close TensorFlow session.
@@ -183,7 +184,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
             print("   val loss: %f" % (val_loss / n_batch))
             print("   val acc: %f" % (val_acc / n_batch))
 
-            db.train_log({'loss': train_lossn_batch/n_batch, 'acc': train_acc/n_batch, 'time': datetime.utcnow()})
+            db.train_log({'loss': train_loss/n_batch, 'acc': train_acc/n_batch, 'time': datetime.utcnow()})
             db.valid_log({'loss': val_loss/n_batch, 'acc': val_acc/n_batch, 'time': datetime.utcnow()})
 
             
@@ -202,7 +203,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     print("   test acc: %f" % (test_acc / n_batch))
 
     db.test_log({'loss': test_loss/n_batch, 'acc': test_acc/n_batch, 'time': datetime.utcnow()})
-    db.save_params(params=sess.run(network.all_params))
+    db.save_params(params=sess.run(network.all_params), args={'type': 'model_cnn'})
         
     
     # In the end, close TensorFlow session.
@@ -270,7 +271,7 @@ def start_workers(db):
 
 
 def master():
-    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
+    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour', studyID="MNIST")
     create_mnist_dataset(db=db)
     create_jobs(db=db, job_name="cv_mnist", models_dict={
         "cnn": {
@@ -320,10 +321,11 @@ def load_mnist_data(db, shape=(-1, 28, 28, 1)):
 
 
 def worker(job_id):
-    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
+    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour', studyID="MNIST")
 
     from bson.objectid import ObjectId
     job = db.find_one_job(args={'_id': ObjectId(job_id)})
+    print(job)
     if job['model'] == 'cnn':
         train_cnn(db=db, n_cnn_layers=job['n_cnn_layers'], lr=job['lr'], n_epochs=job['n_epochs'])
     elif job['model'] == 'mlp':
