@@ -90,11 +90,10 @@ def train_mlp(db, n_layers, lr, n_epochs):
     test_loss, test_acc = sess.run([cost, acc], feed_dict=feed_dict)
     print("   test loss: %f" % test_loss)
     print("   test acc: %f" % test_acc)
-    
+
     db.test_log({'loss': test_loss, 'acc': test_acc, 'time': datetime.utcnow()})
     db.save_params(params=sess.run(network.all_params), args={'type': 'model_mlp'})
-    
-    
+
     # In the end, close TensorFlow session.
     sess.close()
     tl.layers.clear_layers_name()
@@ -115,7 +114,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     if n_cnn_layers < 1 or n_cnn_layers > 2:
         raise Exception('Not yet support')
     filter_sizes = [32, 64]
-    for l in range(n_cnn_layers):
+    for l in range(1, n_cnn_layers+1):
         network = tl.layers.Conv2d(network, n_filter=filter_sizes[l], filter_size=(5, 5), strides=(1, 1), act=tf.nn.relu, padding='SAME', name='cnn{}'.format(l))
         network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2), padding='SAME', name='pool_layer{}'.format(l))
     network = tl.layers.FlattenLayer(network, name='flatten')
@@ -163,7 +162,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
 
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
             print("Epoch %d of %d took %fs" % (epoch + 1, n_epochs, time.time() - start_time))
-            train_loss, train_acc, n_batch = 0, 0, 0
+            train_loss, train_acc, n_batch = 0.0, 0.0, 0
             for X_train_a, y_train_a in tl.iterate.minibatches(
                                     X_train, y_train, batch_size, shuffle=True):
                 dp_dict = tl.utils.dict_to_one( network.all_drop )
@@ -173,7 +172,8 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
                 train_loss += err; train_acc += ac; n_batch += 1
             print("   train loss: %f" % (train_loss / n_batch))
             print("   train acc: %f" % (train_acc / n_batch))
-            val_loss, val_acc, n_batch = 0, 0, 0
+            db.train_log({'loss': (train_loss / n_batch), 'acc': (train_acc / n_batch), 'time': datetime.utcnow()})
+            val_loss, val_acc, n_batch = 0.0, 0.0, 0
             for X_val_a, y_val_a in tl.iterate.minibatches(
                                         X_val, y_val, batch_size, shuffle=True):
                 dp_dict = tl.utils.dict_to_one( network.all_drop )
@@ -183,9 +183,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
                 val_loss += err; val_acc += ac; n_batch += 1
             print("   val loss: %f" % (val_loss / n_batch))
             print("   val acc: %f" % (val_acc / n_batch))
-
-            db.train_log({'loss': train_loss/n_batch, 'acc': train_acc/n_batch, 'time': datetime.utcnow()})
-            db.valid_log({'loss': val_loss/n_batch, 'acc': val_acc/n_batch, 'time': datetime.utcnow()})
+            db.valid_log({'loss': (val_loss/n_batch), 'acc': (val_acc/n_batch), 'time': datetime.utcnow()})
 
             
     print('Evaluation')
@@ -202,94 +200,13 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     print("   test loss: %f" % (test_loss / n_batch))
     print("   test acc: %f" % (test_acc / n_batch))
 
-    db.test_log({'loss': test_loss/n_batch, 'acc': test_acc/n_batch, 'time': datetime.utcnow()})
+    db.test_log({'loss': (test_loss / n_batch), 'acc': (test_acc / n_batch), 'time': datetime.utcnow()})
     db.save_params(params=sess.run(network.all_params), args={'type': 'model_cnn'})
-        
-    
+
     # In the end, close TensorFlow session.
     sess.close()
     tl.layers.clear_layers_name()
     tf.reset_default_graph()
-
-
-### Master node ###
-
-
-def create_mnist_dataset(db):
-    data, f_id = db.find_one_params(args={'type': 'mnist_dataset'})
-    # If cannot find MNIST dataset in TensorDB
-    if not data:
-        # Download and upload MNIST dataset to TensorDB
-        X_train, y_train, X_val, y_val, X_test, y_test = \
-            tl.files.load_mnist_dataset(shape=(-1, 28, 28, 1))
-        f_id = db.save_params(
-            [X_train, y_train, X_val, y_val, X_test, y_test],
-            args={'type': 'mnist_dataset'}
-        )
-        shutil.rmtree('./data/mnist')
-
-
-def create_jobs(db, job_name, models_dict):
-    # job = db.find_one_job(args={'job_name': job_name})
-    # if not job:
-    #     job_idx = 1
-    #     for model, params_dict in models_dict.iteritems():
-    #         n_jobs = len(params_dict.itervalues().next())
-    #         for j in range(n_jobs):
-    #             job_dict = {'model': model, 'job_name': job_name, 'job_id': job_idx}
-    #             for k, v in params_dict.iteritems():
-    #                 job_dict.update({k: v[j]})
-    #             db.save_job(args=job_dict)
-    #             job_idx += 1
-    # else:
-    #     print("You have already submitted this job.")
-    for model, params_dict in models_dict.iteritems():
-        n_jobs = len(params_dict.itervalues().next())
-        for j in range(n_jobs):
-            job_dict = {'model': model}
-            for k, v in params_dict.iteritems():
-                job_dict.update({k: v[j]})
-            db.save_job(args=job_dict)
-
-
-def start_workers(db):
-    job_ids = []
-    for job in db.get_all_jobs():
-        job_ids.append(str(job['_id']))
-
-    # Check how many available workers
-    workers = ['node01', 'node02', 'node03', 'node04', 'node05']
-
-    def submit_job(node_name, job_id):
-        print('Assign job: {} to {}'.format(job_id, node_name))
-        worker(job_id)
-
-    # Submit jobs to all workers
-    submit_job(workers[0], job_ids[0])
-    submit_job(workers[2], job_ids[2])
-    submit_job(workers[4], job_ids[4])
-
-
-def master():
-    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour', studyID="MNIST")
-    create_mnist_dataset(db=db)
-    create_jobs(db=db, job_name="cv_mnist", models_dict={
-        "cnn": {
-            "lr": [0.01, 0.001, 0.001],
-            "n_cnn_layers": [1, 2, 2],
-            "n_filters": [64, 128, 256],
-            "n_epochs": [10, 10, 10],
-        },
-        "mlp": {
-            "lr": [0.05, 0.0001],
-            "n_layers": [1, 2],
-            "n_epochs": [10, 10],
-        }
-    })
-    start_workers(db=db)
-
-
-### Workder node ###
 
 
 def load_mnist_data(db, shape=(-1, 28, 28, 1)):
@@ -325,18 +242,14 @@ def worker(job_id):
 
     from bson.objectid import ObjectId
     job = db.find_one_job(args={'_id': ObjectId(job_id)})
-    print(job)
     if job['model'] == 'cnn':
         train_cnn(db=db, n_cnn_layers=job['n_cnn_layers'], lr=job['lr'], n_epochs=job['n_epochs'])
     elif job['model'] == 'mlp':
         train_mlp(db=db, n_layers=job['n_layers'], lr=job['lr'], n_epochs=job['n_epochs'])
 
 
-### Main ###
-
-
 def main():
-    master()
+    worker(job_id='58dabd44376ffe2dfbd772de')
 
 
 if __name__ == '__main__':
