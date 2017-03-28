@@ -26,9 +26,10 @@ and all inferences share the same model parameters.
 (see tutorial_ptb_lstm.py)
 """
 
+
 def main_test_layers():
     X_train, y_train, X_val, y_val, X_test, y_test = \
-                                    tl.files.load_mnist_dataset(shape=(-1,784))
+        tl.files.load_mnist_dataset(shape=(-1, 784))
 
     X_train = np.asarray(X_train, dtype=np.float32)
     y_train = np.asarray(y_train, dtype=np.int32)
@@ -57,14 +58,14 @@ def main_test_layers():
     network = tl.layers.InputLayer(x, name='input_layer')
     network = tl.layers.DropoutLayer(network, keep=0.8, name='drop1')
     network = tl.layers.DenseLayer(network, n_units=800,
-                                    act = tf.nn.relu, name='relu1')
+                                   act=tf.nn.relu, name='relu1')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
     network = tl.layers.DenseLayer(network, n_units=800,
-                                    act = tf.nn.relu, name='relu2')
+                                   act=tf.nn.relu, name='relu2')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
     network = tl.layers.DenseLayer(network, n_units=10,
-                                    act = tf.identity,
-                                    name='output_layer')
+                                   act=tf.identity,
+                                   name='output_layer')
 
     y = network.outputs
     y_op = tf.argmax(tf.nn.softmax(y), 1)
@@ -83,7 +84,7 @@ def main_test_layers():
     learning_rate = 0.0001
     print_freq = 5
     train_op = tf.train.AdamOptimizer(learning_rate, beta1=0.9, beta2=0.999,
-                                epsilon=1e-08, use_locking=False).minimize(cost)
+                                      epsilon=1e-08, use_locking=False).minimize(cost)
 
     tl.layers.initialize_global_variables(sess)
 
@@ -96,9 +97,9 @@ def main_test_layers():
     for epoch in range(n_epoch):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(X_train, y_train,
-                                                    batch_size, shuffle=True):
+                                                           batch_size, shuffle=True):
             feed_dict = {x: X_train_a, y_: y_train_a}
-            feed_dict.update( network.all_drop )    # enable dropout or dropconnect layers
+            feed_dict.update(network.all_drop)  # enable dropout or dropconnect layers
             sess.run(train_op, feed_dict=feed_dict)
 
             # The optional feed_dict argument allows the caller to override the value of tensors in the graph. Each key in feed_dict can be one of the following types:
@@ -107,21 +108,21 @@ def main_test_layers():
 
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
             print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch, time.time() - start_time))
-            dp_dict = tl.utils.dict_to_one( network.all_drop ) # disable all dropout/dropconnect/denoising layers
+            dp_dict = tl.utils.dict_to_one(network.all_drop)  # disable all dropout/dropconnect/denoising layers
             feed_dict = {x: X_train, y_: y_train}
             feed_dict.update(dp_dict)
             print("   train loss: %f" % sess.run(cost, feed_dict=feed_dict))
-            dp_dict = tl.utils.dict_to_one( network.all_drop )
+            dp_dict = tl.utils.dict_to_one(network.all_drop)
             feed_dict = {x: X_val, y_: y_val}
             feed_dict.update(dp_dict)
             print("   val loss: %f" % sess.run(cost, feed_dict=feed_dict))
             print("   val acc: %f" % np.mean(y_val ==
-                                    sess.run(y_op, feed_dict=feed_dict)))
+                                             sess.run(y_op, feed_dict=feed_dict)))
             try:
                 # You can visualize the weight of 1st hidden layer as follow.
                 tl.visualize.W(network.all_params[0].eval(), second=10,
-                                        saveable=True, shape=[28, 28],
-                                        name='w1_'+str(epoch+1), fig_idx=2012)
+                               saveable=True, shape=[28, 28],
+                               name='w1_' + str(epoch + 1), fig_idx=2012)
                 # You can also save the weight of 1st hidden layer to .npz file.
                 # tl.files.save_npz([network.all_params[0]] , name='w1'+str(epoch+1)+'.npz')
             except:
@@ -129,12 +130,12 @@ def main_test_layers():
                             to save the feature images for different dataset")
 
     print('Evaluation')
-    dp_dict = tl.utils.dict_to_one( network.all_drop )
+    dp_dict = tl.utils.dict_to_one(network.all_drop)
     feed_dict = {x: X_test, y_: y_test}
     feed_dict.update(dp_dict)
     print("   test loss: %f" % sess.run(cost, feed_dict=feed_dict))
     print("   test acc: %f" % np.mean(y_test == sess.run(y_op,
-                                                        feed_dict=feed_dict)))
+                                                         feed_dict=feed_dict)))
 
     # Add ops to save and restore all the variables, including variables for training.
     # ref: https://www.tensorflow.org/versions/r0.8/how_tos/variables/index.html
@@ -142,9 +143,8 @@ def main_test_layers():
     save_path = saver.save(sess, "./model.ckpt")
     print("Model saved in file: %s" % save_path)
 
-
     # You can also save the parameters into .npz file.
-    tl.files.save_npz(network.all_params , name='model.npz')
+    tl.files.save_npz(network.all_params, name='model.npz')
     # You can only save one parameter as follow.
     # tl.files.save_npz([network.all_params[0]] , name='model.npz')
     # Then, restore the parameters as follow.
@@ -153,6 +153,7 @@ def main_test_layers():
 
     # In the end, close TensorFlow session.
     sess.close()
+
 
 def main_test_cnn_layer():
     """Reimplementation of the TensorFlow official MNIST CNN tutorials:
@@ -164,7 +165,6 @@ def main_test_cnn_layer():
     - For simplified CNN layer see "Convolutional layer (Simplified)"
       in read the docs website.
     """
-    
 
     sess = tf.InteractiveSession()
 
@@ -173,26 +173,26 @@ def main_test_cnn_layer():
     # – especially for convolutional layers.
     batch_size = 128
 
-    x = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, 1])   # [batch_size, height, width, channels]
-    y_ = tf.placeholder(tf.int64, shape=[batch_size,])
+    x = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, 1])  # [batch_size, height, width, channels]
+    y_ = tf.placeholder(tf.int64, shape=[batch_size, ])
 
     network = tl.layers.InputLayer(x, name='input_layer')
     network = tl.layers.Conv2d(network, n_filter=32, filter_size=(5, 5), strides=(1, 1),
-            act=tf.nn.relu, padding='SAME', name='cnn1')
+                               act=tf.nn.relu, padding='SAME', name='cnn1')
     network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-            padding='SAME', name='pool_layer1')
+                                  padding='SAME', name='pool_layer1')
     network = tl.layers.Conv2d(network, n_filter=64, filter_size=(5, 5), strides=(1, 1),
-            act=tf.nn.relu, padding='SAME', name='cnn2')
+                               act=tf.nn.relu, padding='SAME', name='cnn2')
     network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-            padding='SAME', name='pool_layer2')
+                                  padding='SAME', name='pool_layer2')
     network = tl.layers.FlattenLayer(network, name='flatten')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop1')
     network = tl.layers.DenseLayer(network, n_units=256,
-                                    act = tf.nn.relu, name='relu1')
+                                   act=tf.nn.relu, name='relu1')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
     network = tl.layers.DenseLayer(network, n_units=10,
-                                    act = tf.identity,
-                                    name='output')
+                                   act=tf.identity,
+                                   name='output')
 
     y = network.outputs
 
@@ -208,7 +208,7 @@ def main_test_cnn_layer():
 
     train_params = network.all_params
     train_op = tf.train.AdamOptimizer(learning_rate, beta1=0.9, beta2=0.999,
-        epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+                                      epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
 
     tl.layers.initialize_global_variables(sess)
     network.print_params()
@@ -220,51 +220,58 @@ def main_test_cnn_layer():
     for epoch in range(n_epoch):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(
-                                    X_train, y_train, batch_size, shuffle=True):
+                X_train, y_train, batch_size, shuffle=True):
             feed_dict = {x: X_train_a, y_: y_train_a}
-            feed_dict.update( network.all_drop )        # enable noise layers
+            feed_dict.update(network.all_drop)  # enable noise layers
             sess.run(train_op, feed_dict=feed_dict)
 
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
             print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch, time.time() - start_time))
             train_loss, train_acc, n_batch = 0, 0, 0
             for X_train_a, y_train_a in tl.iterate.minibatches(
-                                    X_train, y_train, batch_size, shuffle=True):
-                dp_dict = tl.utils.dict_to_one( network.all_drop )    # disable noise layers
+                    X_train, y_train, batch_size, shuffle=True):
+                dp_dict = tl.utils.dict_to_one(network.all_drop)  # disable noise layers
                 feed_dict = {x: X_train_a, y_: y_train_a}
                 feed_dict.update(dp_dict)
                 err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-                train_loss += err; train_acc += ac; n_batch += 1
-            print("   train loss: %f" % (train_loss/ n_batch))
-            print("   train acc: %f" % (train_acc/ n_batch))
+                train_loss += err;
+                train_acc += ac;
+                n_batch += 1
+            print("   train loss: %f" % (train_loss / n_batch))
+            print("   train acc: %f" % (train_acc / n_batch))
             val_loss, val_acc, n_batch = 0, 0, 0
             for X_val_a, y_val_a in tl.iterate.minibatches(
-                                        X_val, y_val, batch_size, shuffle=True):
-                dp_dict = tl.utils.dict_to_one( network.all_drop )    # disable noise layers
+                    X_val, y_val, batch_size, shuffle=True):
+                dp_dict = tl.utils.dict_to_one(network.all_drop)  # disable noise layers
                 feed_dict = {x: X_val_a, y_: y_val_a}
                 feed_dict.update(dp_dict)
                 err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-                val_loss += err; val_acc += ac; n_batch += 1
-            print("   val loss: %f" % (val_loss/ n_batch))
-            print("   val acc: %f" % (val_acc/ n_batch))
+                val_loss += err;
+                val_acc += ac;
+                n_batch += 1
+            print("   val loss: %f" % (val_loss / n_batch))
+            print("   val acc: %f" % (val_acc / n_batch))
             try:
                 tl.visualize.CNN2d(network.all_params[0].eval(),
-                                    second=10, saveable=True,
-                                    name='cnn1_'+str(epoch+1), fig_idx=2012)
+                                   second=10, saveable=True,
+                                   name='cnn1_' + str(epoch + 1), fig_idx=2012)
             except:
-                raise Exception("# You should change visualize.CNN(), if you want to save the feature images for different dataset")
+                raise Exception(
+                    "# You should change visualize.CNN(), if you want to save the feature images for different dataset")
 
     print('Evaluation')
     test_loss, test_acc, n_batch = 0, 0, 0
     for X_test_a, y_test_a in tl.iterate.minibatches(
-                                X_test, y_test, batch_size, shuffle=True):
-        dp_dict = tl.utils.dict_to_one( network.all_drop )    # disable noise layers
+            X_test, y_test, batch_size, shuffle=True):
+        dp_dict = tl.utils.dict_to_one(network.all_drop)  # disable noise layers
         feed_dict = {x: X_test_a, y_: y_test_a}
         feed_dict.update(dp_dict)
         err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-        test_loss += err; test_acc += ac; n_batch += 1
-    print("   test loss: %f" % (test_loss/n_batch))
-    print("   test acc: %f" % (test_acc/n_batch))
+        test_loss += err;
+        test_acc += ac;
+        n_batch += 1
+    print("   test loss: %f" % (test_loss / n_batch))
+    print("   test acc: %f" % (test_acc / n_batch))
 
 
 ### Master node ###
@@ -276,9 +283,9 @@ def create_mnist_dataset(db):
     if not data:
         # Download and upload MNIST dataset to TensorDB
         X_train, y_train, X_val, y_val, X_test, y_test = \
-                        tl.files.load_mnist_dataset(shape=(-1, 28, 28, 1))
+            tl.files.load_mnist_dataset(shape=(-1, 28, 28, 1))
         f_id = db.save_params(
-            [X_train, y_train, X_val, y_val, X_test, y_test], 
+            [X_train, y_train, X_val, y_val, X_test, y_test],
             args={'type': 'mnist_dataset'}
         )
         shutil.rmtree('./data/mnist')
