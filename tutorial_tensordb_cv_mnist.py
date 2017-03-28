@@ -308,27 +308,37 @@ def create_jobs(db, job_name, models_dict):
 
 
 def start_workers(db):
-    obj_ids = []
+    job_ids = []
     for job in db.get_all_jobs():
-        obj_ids.append(str(job['_id']))
+        job_ids.append(str(job['_id']))
 
-    from bson.objectid import ObjectId
-    print(db.find_one_job(args={'_id': ObjectId(obj_ids[0])}))
+    # Check how many available workers
+    workers = ['node01', 'node02', 'node03']
+
+    def submit_job(node_name, job_id):
+        print('Assign job: {} to {}'.format(job_id, node_name))
+        worker(job_id)
+
+    # Submit jobs to all workers
+    submit_job(workers[0], job_ids[0])
+    submit_job(workers[1], job_ids[1])
+    submit_job(workers[2], job_ids[2])
+
 
 def master():
     db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
-    # create_mnist_dataset(db=db)
-    # create_jobs(db=db, job_name="cv_mnist", models_dict={
-    #     "cnn": {
-    #         "learning_rate": [0.01, 0.001, 0.001],
-    #         "n_layers": [3, 5, 7],
-    #         "n_filters": [64, 128, 256]
-    #     },
-    #     "mlp": {
-    #         "learning_rate": [0.05, 0.005],
-    #         "n_layers": [4, 6],
-    #     }
-    # })
+    create_mnist_dataset(db=db)
+    create_jobs(db=db, job_name="cv_mnist", models_dict={
+        "cnn": {
+            "learning_rate": [0.01, 0.001, 0.001],
+            "n_layers": [3, 5, 7],
+            "n_filters": [64, 128, 256]
+        },
+        "mlp": {
+            "learning_rate": [0.05, 0.005],
+            "n_layers": [4, 6],
+        }
+    })
     start_workers(db=db)
 
 
@@ -359,13 +369,12 @@ def load_mnist_data(db):
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 
-def get_jobs(db):
-    pass
-
-
-def worker():
+def worker(job_id):
     db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
     X_train, y_train, X_val, y_val, X_test, y_test = load_mnist_data(db=db)
+
+    from bson.objectid import ObjectId
+    print(db.find_one_job(args={'_id': ObjectId(job_id)}))
 
 
 ### Main ###
@@ -373,7 +382,6 @@ def worker():
 
 def main():
     master()
-    # worker()
 
 
 if __name__ == '__main__':
