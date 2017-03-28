@@ -10,7 +10,7 @@ import time
 import shutil
 
 
-def train_mlp(db):
+def train_mlp(db, n_layers, lr, n_epochs):
     X_train, y_train, X_val, y_val, X_test, y_test = load_mnist_data(db=db, shape=(-1, 784))
 
     sess = tf.InteractiveSession()
@@ -21,16 +21,11 @@ def train_mlp(db):
 
     # MLP
     network = tl.layers.InputLayer(x, name='input_layer')
-    network = tl.layers.DropoutLayer(network, keep=0.8, name='drop1')
-    network = tl.layers.DenseLayer(network, n_units=800,
-                                   act=tf.nn.relu, name='relu1')
-    network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
-    network = tl.layers.DenseLayer(network, n_units=800,
-                                   act=tf.nn.relu, name='relu2')
-    network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
-    network = tl.layers.DenseLayer(network, n_units=10,
-                                   act=tf.identity,
-                                   name='output_layer')
+    for l in range(1, n_layers+1):
+        network = tl.layers.DropoutLayer(network, keep=0.8, name='drop{}'.format(l))
+        network = tl.layers.DenseLayer(network, n_units=800, act=tf.nn.relu, name='relu{}'.format(l))
+    network = tl.layers.DropoutLayer(network, keep=0.5, name='drop'.format(n_layers+1))
+    network = tl.layers.DenseLayer(network, n_units=10, act=tf.identity, name='output_layer')
     y = network.outputs
 
     # Prediction
@@ -45,9 +40,8 @@ def train_mlp(db):
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     # Train op
-    n_epoch = 100
     batch_size = 128
-    learning_rate = 0.0001
+    learning_rate = lr
     print_freq = 5
 
     params = network.all_params
@@ -62,7 +56,7 @@ def train_mlp(db):
     print('   learning_rate: %f' % learning_rate)
     print('   batch_size: %d' % batch_size)
 
-    for epoch in range(n_epoch):
+    for epoch in range(n_epochs):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(X_train, y_train,
                                                            batch_size, shuffle=True):
@@ -71,7 +65,7 @@ def train_mlp(db):
             sess.run(train_op, feed_dict=feed_dict)
 
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
-            print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch, time.time() - start_time))
+            print("Epoch %d of %d took %fs" % (epoch + 1, n_epochs, time.time() - start_time))
             dp_dict = tl.utils.dict_to_one( network.all_drop )
             feed_dict = {x: X_train, y_: y_train}
             feed_dict.update(dp_dict)
@@ -95,9 +89,11 @@ def train_mlp(db):
 
     # In the end, close TensorFlow session.
     sess.close()
+    tl.layers.clear_layers_name()
+    tf.reset_default_graph()
 
 
-def train_cnn(db):
+def train_cnn(db, n_cnn_layers, lr, n_epochs):
     X_train, y_train, X_val, y_val, X_test, y_test = load_mnist_data(db=db, shape=(-1, 28, 28, 1))
 
     sess = tf.InteractiveSession()
@@ -107,22 +103,18 @@ def train_cnn(db):
 
     # CNN
     network = tl.layers.InputLayer(x, name='input_layer')
-    network = tl.layers.Conv2d(network, n_filter=32, filter_size=(5, 5), strides=(1, 1),
-                               act=tf.nn.relu, padding='SAME', name='cnn1')
-    network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-                                  padding='SAME', name='pool_layer1')
-    network = tl.layers.Conv2d(network, n_filter=64, filter_size=(5, 5), strides=(1, 1),
-                               act=tf.nn.relu, padding='SAME', name='cnn2')
-    network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-                                  padding='SAME', name='pool_layer2')
+
+    if n_cnn_layers < 1 or n_cnn_layers > 2:
+        raise Exception('Not yet support')
+    filter_sizes = [32, 64]
+    for l in range(n_cnn_layers):
+        network = tl.layers.Conv2d(network, n_filter=filter_sizes[l], filter_size=(5, 5), strides=(1, 1), act=tf.nn.relu, padding='SAME', name='cnn{}'.format(l))
+        network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2), padding='SAME', name='pool_layer{}'.format(l))
     network = tl.layers.FlattenLayer(network, name='flatten')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop1')
-    network = tl.layers.DenseLayer(network, n_units=256,
-                                   act=tf.nn.relu, name='relu1')
+    network = tl.layers.DenseLayer(network, n_units=256, act=tf.nn.relu, name='relu1')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
-    network = tl.layers.DenseLayer(network, n_units=10,
-                                   act=tf.identity,
-                                   name='output')
+    network = tl.layers.DenseLayer(network, n_units=10, act=tf.identity, name='output')
 
     y = network.outputs
 
@@ -138,7 +130,6 @@ def train_cnn(db):
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     # Train op
-    n_epoch = 200
     batch_size = 128
     learning_rate = 0.0001
     print_freq = 10
@@ -154,7 +145,7 @@ def train_cnn(db):
     print('   learning_rate: %f' % learning_rate)
     print('   batch_size: %d' % batch_size)
 
-    for epoch in range(n_epoch):
+    for epoch in range(n_epochs):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(
                 X_train, y_train, batch_size, shuffle=True):
@@ -163,7 +154,7 @@ def train_cnn(db):
             sess.run(train_op, feed_dict=feed_dict)
 
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
-            print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch, time.time() - start_time))
+            print("Epoch %d of %d took %fs" % (epoch + 1, n_epochs, time.time() - start_time))
             train_loss, train_acc, n_batch = 0, 0, 0
             for X_train_a, y_train_a in tl.iterate.minibatches(
                                     X_train, y_train, batch_size, shuffle=True):
@@ -192,12 +183,17 @@ def train_cnn(db):
         dp_dict = tl.utils.dict_to_one( network.all_drop )
         feed_dict = {x: X_test_a, y_: y_test_a}
         feed_dict.update(dp_dict)
-        err, acc = sess.run([cost, acc], feed_dict=feed_dict)
+        err, ac = sess.run([cost, acc], feed_dict=feed_dict)
         test_loss += err
-        test_acc += acc
+        test_acc += ac
         n_batch += 1
     print("   test loss: %f" % (test_loss / n_batch))
     print("   test acc: %f" % (test_acc / n_batch))
+
+    # In the end, close TensorFlow session.
+    sess.close()
+    tl.layers.clear_layers_name()
+    tf.reset_default_graph()
 
 
 ### Master node ###
@@ -253,25 +249,27 @@ def start_workers(db):
         worker(job_id)
 
     # Submit jobs to all workers
-    # submit_job(workers[0], job_ids[0])
-    # submit_job(workers[2], job_ids[2])
+    submit_job(workers[0], job_ids[0])
+    submit_job(workers[2], job_ids[2])
     submit_job(workers[4], job_ids[4])
 
 
 def master():
     db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
-    # create_mnist_dataset(db=db)
-    # create_jobs(db=db, job_name="cv_mnist", models_dict={
-    #     "cnn": {
-    #         "learning_rate": [0.01, 0.001, 0.001],
-    #         "n_layers": [3, 5, 7],
-    #         "n_filters": [64, 128, 256]
-    #     },
-    #     "mlp": {
-    #         "learning_rate": [0.05, 0.005],
-    #         "n_layers": [4, 6],
-    #     }
-    # })
+    create_mnist_dataset(db=db)
+    create_jobs(db=db, job_name="cv_mnist", models_dict={
+        "cnn": {
+            "lr": [0.01, 0.001, 0.001],
+            "n_cnn_layers": [1, 2, 2],
+            "n_filters": [64, 128, 256],
+            "n_epochs": [10, 10, 10],
+        },
+        "mlp": {
+            "lr": [0.05, 0.0001],
+            "n_layers": [1, 2],
+            "n_epochs": [10, 10],
+        }
+    })
     start_workers(db=db)
 
 
@@ -312,9 +310,9 @@ def worker(job_id):
     from bson.objectid import ObjectId
     job = db.find_one_job(args={'_id': ObjectId(job_id)})
     if job['model'] == 'cnn':
-        train_cnn(db=db)
+        train_cnn(db=db, n_cnn_layers=job['n_cnn_layers'], lr=job['lr'], n_epochs=job['n_epochs'])
     elif job['model'] == 'mlp':
-        train_mlp(db=db)
+        train_mlp(db=db, n_layers=job['n_layers'], lr=job['lr'], n_epochs=job['n_epochs'])
 
 
 ### Main ###
