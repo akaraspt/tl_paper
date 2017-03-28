@@ -9,6 +9,7 @@ from tensorlayer.layers import set_keep
 import time
 import shutil
 
+
 def train_mlp(db):
     X_train, y_train, X_val, y_val, X_test, y_test = load_mnist_data(db=db, shape=(-1, 784))
 
@@ -22,14 +23,14 @@ def train_mlp(db):
     network = tl.layers.InputLayer(x, name='input_layer')
     network = tl.layers.DropoutLayer(network, keep=0.8, name='drop1')
     network = tl.layers.DenseLayer(network, n_units=800,
-                                    act = tf.nn.relu, name='relu1')
+                                   act=tf.nn.relu, name='relu1')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
     network = tl.layers.DenseLayer(network, n_units=800,
-                                    act = tf.nn.relu, name='relu2')
+                                   act=tf.nn.relu, name='relu2')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
     network = tl.layers.DenseLayer(network, n_units=10,
-                                    act = tf.identity,
-                                    name='output_layer')
+                                   act=tf.identity,
+                                   name='output_layer')
     y = network.outputs
 
     # Prediction
@@ -51,7 +52,7 @@ def train_mlp(db):
 
     params = network.all_params
     train_op = tf.train.AdamOptimizer(learning_rate, beta1=0.9, beta2=0.999,
-                                epsilon=1e-08, use_locking=False).minimize(cost)
+                                      epsilon=1e-08, use_locking=False).minimize(cost)
 
     tl.layers.initialize_global_variables(sess)
 
@@ -64,7 +65,7 @@ def train_mlp(db):
     for epoch in range(n_epoch):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(X_train, y_train,
-                                                    batch_size, shuffle=True):
+                                                           batch_size, shuffle=True):
             feed_dict = {x: X_train_a, y_: y_train_a}
             feed_dict.update( network.all_drop )
             sess.run(train_op, feed_dict=feed_dict)
@@ -85,7 +86,7 @@ def train_mlp(db):
             print("   val acc: %f" % valid_acc)
 
     print('Evaluation')
-    dp_dict = tl.utils.dict_to_one( network.all_drop )
+    dp_dict = tl.utils.dict_to_one(network.all_drop)
     feed_dict = {x: X_test, y_: y_test}
     feed_dict.update(dp_dict)
     test_loss, test_acc = sess.run([cost, acc], feed_dict=feed_dict)
@@ -94,6 +95,7 @@ def train_mlp(db):
 
     # In the end, close TensorFlow session.
     sess.close()
+
 
 def train_cnn(db):
     X_train, y_train, X_val, y_val, X_test, y_test = load_mnist_data(db=db, shape=(-1, 28, 28, 1))
@@ -106,21 +108,21 @@ def train_cnn(db):
     # CNN
     network = tl.layers.InputLayer(x, name='input_layer')
     network = tl.layers.Conv2d(network, n_filter=32, filter_size=(5, 5), strides=(1, 1),
-            act=tf.nn.relu, padding='SAME', name='cnn1')
+                               act=tf.nn.relu, padding='SAME', name='cnn1')
     network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-            padding='SAME', name='pool_layer1')
+                                  padding='SAME', name='pool_layer1')
     network = tl.layers.Conv2d(network, n_filter=64, filter_size=(5, 5), strides=(1, 1),
-            act=tf.nn.relu, padding='SAME', name='cnn2')
+                               act=tf.nn.relu, padding='SAME', name='cnn2')
     network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2),
-            padding='SAME', name='pool_layer2')
+                                  padding='SAME', name='pool_layer2')
     network = tl.layers.FlattenLayer(network, name='flatten')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop1')
     network = tl.layers.DenseLayer(network, n_units=256,
-                                    act = tf.nn.relu, name='relu1')
+                                   act=tf.nn.relu, name='relu1')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
     network = tl.layers.DenseLayer(network, n_units=10,
-                                    act = tf.identity,
-                                    name='output')
+                                   act=tf.identity,
+                                   name='output')
 
     y = network.outputs
 
@@ -143,7 +145,7 @@ def train_cnn(db):
 
     train_params = network.all_params
     train_op = tf.train.AdamOptimizer(learning_rate, beta1=0.9, beta2=0.999,
-        epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+                                      epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
 
     tl.layers.initialize_global_variables(sess)
     network.print_params()
@@ -155,7 +157,7 @@ def train_cnn(db):
     for epoch in range(n_epoch):
         start_time = time.time()
         for X_train_a, y_train_a in tl.iterate.minibatches(
-                                    X_train, y_train, batch_size, shuffle=True):
+                X_train, y_train, batch_size, shuffle=True):
             feed_dict = {x: X_train_a, y_: y_train_a}
             feed_dict.update( network.all_drop )
             sess.run(train_op, feed_dict=feed_dict)
@@ -190,10 +192,12 @@ def train_cnn(db):
         dp_dict = tl.utils.dict_to_one( network.all_drop )
         feed_dict = {x: X_test_a, y_: y_test_a}
         feed_dict.update(dp_dict)
-        err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-        test_loss += err; test_acc += ac; n_batch += 1
-    print("   test loss: %f" % (test_loss/n_batch))
-    print("   test acc: %f" % (test_acc/n_batch))
+        err, acc = sess.run([cost, acc], feed_dict=feed_dict)
+        test_loss += err
+        test_acc += acc
+        n_batch += 1
+    print("   test loss: %f" % (test_loss / n_batch))
+    print("   test acc: %f" % (test_acc / n_batch))
 
 
 ### Master node ###
@@ -205,9 +209,9 @@ def create_mnist_dataset(db):
     if not data:
         # Download and upload MNIST dataset to TensorDB
         X_train, y_train, X_val, y_val, X_test, y_test = \
-                        tl.files.load_mnist_dataset(shape=(-1, 28, 28, 1))
+            tl.files.load_mnist_dataset(shape=(-1, 28, 28, 1))
         f_id = db.save_params(
-            [X_train, y_train, X_val, y_val, X_test, y_test], 
+            [X_train, y_train, X_val, y_val, X_test, y_test],
             args={'type': 'mnist_dataset'}
         )
         shutil.rmtree('./data/mnist')
@@ -249,9 +253,9 @@ def start_workers(db):
         worker(job_id)
 
     # Submit jobs to all workers
-    submit_job(workers[0], job_ids[0])
+    # submit_job(workers[0], job_ids[0])
     # submit_job(workers[2], job_ids[2])
-    # submit_job(workers[4], job_ids[4])
+    submit_job(workers[4], job_ids[4])
 
 
 def master():
