@@ -22,6 +22,21 @@ import pickle
 from pymongo import MongoClient
 from datetime import datetime
 
+
+
+import inspect
+
+def AutoFill(func):
+    def func_wrapper(self,*args,**kwargs):
+        d=inspect.getcallargs(func,self,*args,**kwargs)
+        d['args'].update({"studyID":self.studyID})
+        return  func(**d)
+    return func_wrapper
+
+
+
+
+
 class TensorDB(object):
     """TensorDB is a MongoDB based manager that help you to manage data, model and logging.
 
@@ -69,7 +84,7 @@ class TensorDB(object):
         self.db = client[db_name]
         if user_name != None:
             self.db.authenticate(user_name, password)
-            
+
         if studyID is None:
             self.studyID=str(uuid.uuid1())
         else:
@@ -168,13 +183,14 @@ class TensorDB(object):
 
     def __autofill(self,args):
         return args.update({'studyID':self.studyID})
-    
+
     def __serialization(self,ps):
         return pickle.dumps(ps, protocol=2)
-    
+
     def __deserialization(self,ps):
         return pickle.loads(ps)
-    
+
+    @AutoFill
     def save_params(self, params=[], args={}):#, file_name='parameters'):
         """ Save parameters into MongoDB Buckets, and save the file ID into Params Collections.
 
@@ -187,8 +203,8 @@ class TensorDB(object):
         ---------
         f_id : the Buckets ID of the parameters.
         """
-        
-        self.__autofill(args)
+
+
         s = time.time()
         f_id = self.paramsfs.put(self.__serialization(params))#, file_name=file_name)
         args.update({'f_id': f_id, 'time': datetime.utcnow()})
@@ -198,6 +214,7 @@ class TensorDB(object):
         print("[TensorDB] Save params: SUCCESS, took: {}s".format(round(time.time()-s, 2)))
         return f_id
 
+    @AutoFill
     def find_one_params(self, args={}):
         """ Find one parameter from MongoDB Buckets.
 
@@ -210,7 +227,7 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
         f_id : the Buckets ID of the parameters, return False if nothing found.
         """
-        self.__autofill(args)
+
         s = time.time()
         d = self.db.Params.find_one(args)
 
@@ -226,6 +243,7 @@ class TensorDB(object):
         except:
             return False, False
 
+    @AutoFill
     def find_all_params(self, args={}):
         """ Find all parameter from MongoDB Buckets
 
@@ -236,10 +254,9 @@ class TensorDB(object):
         Returns
         --------
         params : the parameters, return False if nothing found.
-        
+
         """
-        self.__autofill(args)
-        
+
         s = time.time()
         pc = self.db.Params.find(args)
 
@@ -256,6 +273,7 @@ class TensorDB(object):
         print("[TensorDB] Find all params SUCCESS, took: {}s".format(round(time.time()-s, 2)))
         return params
 
+    @AutoFill
     def del_params(self, args={}):
         """ Delete params in MongoDB uckets.
 
@@ -263,7 +281,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all parameters.
         """
-        self.__autofill(args)
+
         pc = self.db.Params.find(args)
         f_id_list = pc.distinct('f_id')
         # remove from Buckets
@@ -274,15 +292,17 @@ class TensorDB(object):
 
         print("[TensorDB] Delete params SUCCESS: {}".format(args))
 
+
     def _print_dict(self, args):
         # return " / ".join(str(key) + ": "+ str(value) for key, value in args.items())
-        self.__autofill(args)
+
         string = ''
         for key, value in args.items():
             if key is not '_id':
                 string += str(key) + ": "+ str(value) + " / "
         return string
 
+    @AutoFill
     def save_job(self, script=None, args={}):
         """Save the job.
 
@@ -302,7 +322,7 @@ class TensorDB(object):
         >>> import _your_script
         ... running your script
         """
-        self.__autofill(args)
+
         if script is not None:
             _script = open(script, 'rb').read()
             args.update({'script': _script, 'script_name': script})
@@ -312,6 +332,7 @@ class TensorDB(object):
         print("[TensorDB] Save Job: script={}, args={}".format(script, args))
         return _result
 
+    @AutoFill
     def find_one_job(self, args={}):
         """ Find one job from MongoDB Job Collections.
 
@@ -323,8 +344,8 @@ class TensorDB(object):
         --------
         dictionary : contains all meta data and script.
         """
-        
-        self.__autofill(args)
+
+
         temp = self.db.Job.find_one(args)
 
         if temp is not None:
@@ -336,16 +357,17 @@ class TensorDB(object):
         else:
             print("[TensorDB] FAIL! Cannot find any: {}".format(args))
             return False
-        
+
         return temp
 
+    @AutoFill
     def get_all_jobs(self, args={}):
         """ Get all parameter from MongoDB Buckets
         Returns
         --------
         params : the parameters, return False if nothing found.
         """
-        self.__autofill(args)
+
 
         s = time.time()
         cursor = self.db.Job.find({})
@@ -361,6 +383,7 @@ class TensorDB(object):
         print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))
         return jobs
 
+    @AutoFill
     def train_log(self, args={}):
         """Save the training log.
 
@@ -372,12 +395,13 @@ class TensorDB(object):
         ---------
         >>> db.train_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
-        self.__autofill(args)
+
         _result = self.db.TrainLog.insert_one(args)
         _log = self._print_dict(args)
         print("[TensorDB] TrainLog: " +_log)
         return _result
 
+    @AutoFill
     def del_train_log(self, args={}):
         """ Delete train log.
 
@@ -385,10 +409,11 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all log.
         """
-        self.__autofill(args)
+
         self.db.TrainLog.delete_many(args)
         print("[TensorDB] Delete TrainLog SUCCESS")
 
+    @AutoFill
     def valid_log(self, args={}):
         """Save the validating log.
 
@@ -400,13 +425,14 @@ class TensorDB(object):
         ---------
         >>> db.valid_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
-        self.__autofill(args)
+
         _result = self.db.ValidLog.insert_one(args)
         # _log = "".join(str(key) + ": " + str(value) for key, value in args.items())
         _log = self._print_dict(args)
         print("[TensorDB] ValidLog: " +_log)
         return _result
 
+    @AutoFill
     def del_valid_log(self, args={}):
         """ Delete validation log.
 
@@ -418,6 +444,7 @@ class TensorDB(object):
         self.db.ValidLog.delete_many(args)
         print("[TensorDB] Delete ValidLog SUCCESS")
 
+    @AutoFill
     def test_log(self, args={}):
         """Save the testing log.
 
@@ -429,13 +456,15 @@ class TensorDB(object):
         ---------
         >>> db.test_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
-        self.__autofill(args)
+
         _result = self.db.TestLog.insert_one(args)
         # _log = "".join(str(key) + str(value) for key, value in args.items())
         _log = self._print_dict(args)
         print("[TensorDB] TestLog: " +_log)
         return _result
 
+
+    @AutoFill
     def del_test_log(self, args={}):
         """ Delete test log.
 
@@ -443,7 +472,7 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all log.
         """
-        self.__autofill(args)
+
         self.db.TestLog.delete_many(args)
         print("[TensorDB] Delete TestLog SUCCESS")
 
@@ -451,17 +480,17 @@ class TensorDB(object):
         _s = "[TensorDB] Info:\n"
         _t = _s + "    " + str(self.db)
         return _t
-        
-    
+
+    @AutoFill
     def save_model_architecture(self,s,args):
-        self.__autofill(args)
+
         fid=self.archfs.put(s,filename="modelarchitecture")
         args.update({"fid":fid})
         self.db.march.insert_one(args)
-        
-     
+
+    @AutoFill
     def load_model_architecture(self,args):
-        self.__autofill(args)
+        
         d = self.db.march.find_one(args)
         if d is not None:
             fid = d['fid']
@@ -480,4 +509,3 @@ class TensorDB(object):
             print ("exception")
             print (e)
             return False, False
-
