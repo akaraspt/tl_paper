@@ -8,6 +8,7 @@ import http
 import json
 
 from http import client
+from uuid import uuid4
 
 __author__ = "Axel Oehmichen"
 __copyright__ = "Copyright 2017, Axel Oehmichen"
@@ -47,13 +48,18 @@ class eAE(object):
         clusters = json.loads(str_response)
         return clusters
 
-    def submit_jobs(self):
+    def submit_jobs(self, parameters_set, cluster, computation_type, main_file ,host_ip, ssh_port=22,):
         """Submit jobs to the eAE backend
         
         This method is called when a specific task needs to be deployed on a cluster.
         """
         #TODO: to be continued
-        self.connection.request('POST', '/interfaceEAE/OpenLava/submitJob')
+        uuid = uuid4()
+        zip_file = "{0}.zip".format(uuid)
+        configs = parameters_set
+        data = dict(id=uuid, host_ip=host_ip, ssh_port=ssh_port, zip=zip_file, configs=configs, cluster=cluster,
+                    clusterType=computation_type, mainScriptExport=main_file)
+        self.connection.request('POST', '/interfaceEAE/OpenLava/submitJob', data)
         return
 
 
