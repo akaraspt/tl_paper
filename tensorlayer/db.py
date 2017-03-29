@@ -208,7 +208,6 @@ class TensorDB(object):
         s = time.time()
         f_id = self.paramsfs.put(self.__serialization(params))#, file_name=file_name)
         args.update({'f_id': f_id, 'time': datetime.utcnow()})
-        print(args)
         self.db.Params.insert_one(args)
         # print("[TensorDB] Save params: {} SUCCESS, took: {}s".format(file_name, round(time.time()-s, 2)))
         print("[TensorDB] Save params: SUCCESS, took: {}s".format(round(time.time()-s, 2)))
