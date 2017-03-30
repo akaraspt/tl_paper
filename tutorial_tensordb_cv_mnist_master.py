@@ -4,6 +4,7 @@
 import tensorlayer as tl
 from tensorlayer.db import TensorDB
 import shutil
+from eAE import eAE
 
 
 def create_mnist_dataset(db):
@@ -77,7 +78,34 @@ def main():
             "n_epochs": [10, 10],
         }
     })
-    # start_workers(db=db)
+
+    # Setting up the connection to interface
+    ip = "interfaceeae.doc.ic.ac.uk"
+    port = 443
+    eae = eAE(ip, port)
+
+    # Testing if the interface is Alive
+    is_alive = eae.is_eae_alive()
+    if(is_alive != 200){
+        raise Exception
+    }
+
+    args = [
+        "job_id database_meta", # seperate each arguments using space
+        "job_id database_meta",
+        "job_id database_meta"
+    ]
+
+    # We submit a dummy job
+    parameters_set = "\n".join(args)
+    cluster = "python_small"
+    computation_type = "Python"
+    main_file = "/home/akara/Workspace/tl_paper/tutorial_tensordb_cv_mnist_worker.py"
+    data_files = ['/home/akara/Workspace/tl_paper/tensorlayer', '/home/akara/Workspace/tl_paper/tutorial_tensordb_atari_pong_trainer.py']
+    host_ip = "dsihuaweiroom.doc.ic.ac.uk"
+    ssh_port = "22"
+    job = eae.submit_jobs(parameters_set, cluster, computation_type, main_file, data_files, host_ip, ssh_port)
+    print(job)
 
 
 if __name__ == '__main__':
