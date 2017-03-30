@@ -4,7 +4,7 @@
 import tensorlayer as tl
 from tensorlayer.db import TensorDB
 import shutil
-from eAE import eAE
+from eAE.eAE import eAE
 
 
 def create_mnist_dataset(db):
@@ -86,22 +86,19 @@ def main():
 
     # Testing if the interface is Alive
     is_alive = eae.is_eae_alive()
-    if(is_alive != 200){
-        raise Exception
-    }
+    if is_alive != 200:
+        raise Exception("!!!")
 
-    args = [
-        "job_id database_meta", # seperate each arguments using space
-        "job_id database_meta",
-        "job_id database_meta"
-    ]
+    # Get all jobs
+    jobs = db.get_all_jobs()
+    args = [str(j['_id']) for j in jobs]
 
     # We submit a dummy job
     parameters_set = "\n".join(args)
-    cluster = "python_small"
+    cluster = "python_dev"
     computation_type = "Python"
     main_file = "/home/akara/Workspace/tl_paper/tutorial_tensordb_cv_mnist_worker.py"
-    data_files = ['/home/akara/Workspace/tl_paper/tensorlayer', '/home/akara/Workspace/tl_paper/tutorial_tensordb_atari_pong_trainer.py']
+    data_files = ['/home/akara/Workspace/tl_paper/tensorlayer']
     host_ip = "dsihuaweiroom.doc.ic.ac.uk"
     ssh_port = "22"
     job = eae.submit_jobs(parameters_set, cluster, computation_type, main_file, data_files, host_ip, ssh_port)

@@ -9,6 +9,7 @@ from tensorlayer.db import TensorDB
 from tensorlayer.layers import set_keep
 import time
 import shutil
+import sys
 
 
 def train_mlp(db, n_layers, lr, n_epochs):
@@ -249,7 +250,8 @@ def worker(job_id):
 
 
 def main():
-    worker(job_id='58dabd44376ffe2dfbd772de')
+    # worker(job_id='58dabd44376ffe2dfbd772de')
+    worker(job_id=sys.argv[1])
 
 
 if __name__ == '__main__':
