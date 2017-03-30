@@ -81,8 +81,8 @@ def train_mlp(db, n_layers, lr, n_epochs):
             print("   val loss: %f" % valid_loss)
             print("   val acc: %f" % valid_acc)
             
-            db.train_log({'loss': train_loss, 'acc': train_acc, 'time': datetime.utcnow()})
-            db.valid_log({'loss': valid_loss, 'acc': valid_acc, 'time': datetime.utcnow()})
+            db.train_log({'loss': np.asscalar(train_loss), 'acc': np.asscalar(train_acc), 'time': datetime.utcnow()})
+            db.valid_log({'loss': np.asscalar(valid_loss), 'acc': np.asscalar(valid_acc), 'time': datetime.utcnow()})
 
     print('Evaluation')
     dp_dict = tl.utils.dict_to_one(network.all_drop)
@@ -92,7 +92,7 @@ def train_mlp(db, n_layers, lr, n_epochs):
     print("   test loss: %f" % test_loss)
     print("   test acc: %f" % test_acc)
 
-    db.test_log({'loss': test_loss, 'acc': test_acc, 'time': datetime.utcnow()})
+    db.test_log({'loss': np.asscalar(test_loss), 'acc': np.asscalar(test_acc), 'time': datetime.utcnow()})
     db.save_params(params=sess.run(network.all_params), args={'type': 'model_mlp'})
 
     # In the end, close TensorFlow session.
@@ -115,9 +115,9 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     if n_cnn_layers < 1 or n_cnn_layers > 2:
         raise Exception('Not yet support')
     filter_sizes = [32, 64]
-    for l in range(1, n_cnn_layers+1):
-        network = tl.layers.Conv2d(network, n_filter=filter_sizes[l], filter_size=(5, 5), strides=(1, 1), act=tf.nn.relu, padding='SAME', name='cnn{}'.format(l))
-        network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2), padding='SAME', name='pool_layer{}'.format(l))
+    for l in range(n_cnn_layers):
+        network = tl.layers.Conv2d(network, n_filter=filter_sizes[l], filter_size=(5, 5), strides=(1, 1), act=tf.nn.relu, padding='SAME', name='cnn{}'.format(l+1))
+        network = tl.layers.MaxPool2d(network, filter_size=(2, 2), strides=(2, 2), padding='SAME', name='pool_layer{}'.format(l+1))
     network = tl.layers.FlattenLayer(network, name='flatten')
     network = tl.layers.DropoutLayer(network, keep=0.5, name='drop1')
     network = tl.layers.DenseLayer(network, n_units=256, act=tf.nn.relu, name='relu1')
@@ -173,7 +173,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
                 train_loss += err; train_acc += ac; n_batch += 1
             print("   train loss: %f" % (train_loss / n_batch))
             print("   train acc: %f" % (train_acc / n_batch))
-            db.train_log({'loss': (train_loss / n_batch), 'acc': (train_acc / n_batch), 'time': datetime.utcnow()})
+            db.train_log({'loss': np.asscalar(train_loss / n_batch), 'acc': np.asscalar(train_acc / n_batch), 'time': datetime.utcnow()})
             val_loss, val_acc, n_batch = 0.0, 0.0, 0
             for X_val_a, y_val_a in tl.iterate.minibatches(
                                         X_val, y_val, batch_size, shuffle=True):
@@ -184,7 +184,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
                 val_loss += err; val_acc += ac; n_batch += 1
             print("   val loss: %f" % (val_loss / n_batch))
             print("   val acc: %f" % (val_acc / n_batch))
-            db.valid_log({'loss': (val_loss/n_batch), 'acc': (val_acc/n_batch), 'time': datetime.utcnow()})
+            db.valid_log({'loss': np.asscalar(val_loss/n_batch), 'acc': np.asscalar(val_acc/n_batch), 'time': datetime.utcnow()})
 
             
     print('Evaluation')
@@ -201,7 +201,7 @@ def train_cnn(db, n_cnn_layers, lr, n_epochs):
     print("   test loss: %f" % (test_loss / n_batch))
     print("   test acc: %f" % (test_acc / n_batch))
 
-    db.test_log({'loss': (test_loss / n_batch), 'acc': (test_acc / n_batch), 'time': datetime.utcnow()})
+    db.test_log({'loss': np.asscalar(test_loss / n_batch), 'acc': np.asscalar(test_acc / n_batch), 'time': datetime.utcnow()})
     db.save_params(params=sess.run(network.all_params), args={'type': 'model_cnn'})
 
     # In the end, close TensorFlow session.

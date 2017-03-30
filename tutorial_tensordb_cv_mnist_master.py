@@ -95,8 +95,8 @@ def main():
 
     # We submit a dummy job
     parameters_set = "\n".join(args)
-    cluster = "python_dev"
-    computation_type = "Python"
+    cluster = "gpu_dev"
+    computation_type = "GPU"
     main_file = "/home/akara/Workspace/tl_paper/tutorial_tensordb_cv_mnist_worker.py"
     data_files = ['/home/akara/Workspace/tl_paper/tensorlayer']
     host_ip = "dsihuaweiroom.doc.ic.ac.uk"
