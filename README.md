@@ -1,4 +1,4 @@
-# Experiments for ACM MM
+# Experiments for ACM MM Open Source Software Competition
 
 ## Raw Performance
 * TensorFlow implementation [click](https://www.tensorflow.org/tutorials/deep_cnn)
