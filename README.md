@@ -13,7 +13,7 @@
 * Hi Akara, if this part is in another repo, please link it
 
 ## Generative Adversarial Network
-* [Text to image synthesis](https://github.com/zsdonghao/text-to-image)
+* Please check [Text to image synthesis](https://github.com/zsdonghao/text-to-image)
 
 
 ## More
