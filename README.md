@@ -7,8 +7,8 @@
 ## Deep Reinforcement Learning
 * Install OpenAI gym
 * xxx
-* `[tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py)` is the data generator.
-* `tutorial_tensordb_atari_pong_trainer.py` is the GPU trainer.
+* [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
+* [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
 
 ## Hyper-parameter selection and cross-validation
 * Hi Akara, if this part is in another repo, please link it
