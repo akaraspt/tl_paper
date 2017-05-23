@@ -1,4 +1,4 @@
-# Experiments for ACM MM Open Source Software Competition
+# Codes for ACM MM Open Source Software Competition
 
 ## Setup Environment
 * TensorFlow 1.0
