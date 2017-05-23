@@ -55,11 +55,6 @@ resume = False # load model, resume from previous checkpoint?
 X_train, y_train, X_test, y_test = tl.files.load_cifar10_dataset(
                                     shape=(-1, 32, 32, 3), plotable=False)
 
-# X_train = np.asarray(X_train, dtype=np.float32)
-# y_train = np.asarray(y_train, dtype=np.int64)
-# X_test = np.asarray(X_test, dtype=np.float32)
-# y_test = np.asarray(y_test, dtype=np.int64)
-
 print('X_train.shape', X_train.shape)   # (50000, 32, 32, 3)
 print('y_train.shape', y_train.shape)   # (50000,)
 print('X_test.shape', X_test.shape)     # (10000, 32, 32, 3)
@@ -76,15 +71,7 @@ def data_to_tfrecord(images, labels, filename):
     writer = tf.python_io.TFRecordWriter(filename)
     for index, img in enumerate(images):
         img_raw = img.tobytes()
-        ## Visualize a image
-        # tl.visualize.frame(np.asarray(img, dtype=np.uint8), second=1, saveable=False, name='frame', fig_idx=1236)
         label = int(labels[index])
-        # print(label)
-        ## Convert the bytes back to image as follow:
-            # image = Image.frombytes('RGB', (32, 32), img_raw)
-        # image = np.fromstring(img_raw, np.float32)
-        # image = image.reshape([32, 32, 3])
-        # tl.visualize.frame(np.asarray(image, dtype=np.uint8), second=1, saveable=False, name='frame', fig_idx=1236)
         example = tf.train.Example(features=tf.train.Features(feature={
             "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
             'img_raw': tf.train.Feature(bytes_list=tf.train.BytesList(value=[img_raw])),
@@ -139,33 +126,6 @@ def read_and_decode(filename, is_train=None):
 data_to_tfrecord(images=X_train, labels=y_train, filename="train.cifar10")
 data_to_tfrecord(images=X_test, labels=y_test, filename="test.cifar10")
 
-## Example to visualize data
-# img, label = read_and_decode("train.cifar10", None)
-# img_batch, label_batch = tf.train.shuffle_batch([img, label],
-#                                                 batch_size=4,
-#                                                 capacity=50000,
-#                                                 min_after_dequeue=10000,
-#                                                 num_threads=1)
-# print("img_batch   : %s" % img_batch._shape)
-# print("label_batch : %s" % label_batch._shape)
-#
-# init = tf.initialize_all_variables()
-# with tf.Session() as sess:
-#     sess.run(init)
-#     coord = tf.train.Coordinator()
-#     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-#
-#     for i in range(3):  # number of mini-batch (step)
-#         print("Step %d" % i)
-#         val, l = sess.run([img_batch, label_batch])
-#         # exit()
-#         print(val.shape, l)
-#         tl.visualize.images2d(val, second=1, saveable=False, name='batch'+str(i), dtype=np.uint8, fig_idx=2020121)
-#
-#     coord.request_stop()
-#     coord.join(threads)
-#     sess.close()
-
 batch_size = 128
 model_file_name = "model_cifar10_advanced.ckpt"
 resume = False # load model, resume from previous checkpoint?
@@ -192,29 +152,16 @@ def model(x_crop, y_, reuse):
         net = InputLayer(x_crop, name='input')
         net = Conv2d(net, 64, (5, 5), (1, 1), padding='SAME',
                     W_init=W_init, name='cnn1')
-        # net = Conv2dLayer(net, act=tf.nn.relu, shape=[5, 5, 3, 64],
-        #             strides=[1, 1, 1, 1], padding='SAME',                 # 64 features for each 5x5x3 patch
-        #             W_init=W_init, name ='cnn1')           # output: (batch_size, 24, 24, 64)
         net = MaxPool2d(net, (3, 3), (2, 2), padding='SAME',name='pool1')
-        # net = PoolLayer(net, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
-        #             padding='SAME', pool = tf.nn.max_pool, name ='pool1',)# output: (batch_size, 12, 12, 64)
         net = LocalResponseNormLayer(net, depth_radius=4, bias=1.0,
                     alpha=0.001 / 9.0, beta=0.75, name='norm1')
-        # net.outputs = tf.nn.lrn(net.outputs, 4, bias=1.0, alpha=0.001 / 9.0,
-        #            beta=0.75, name='norm1')
 
         net = Conv2d(net, 64, (5, 5), (1, 1), padding='SAME',
                     W_init=W_init, name='cnn2')
-        # net = Conv2dLayer(net, act=tf.nn.relu, shape=[5, 5, 64, 64],
-        #             strides=[1, 1, 1, 1], padding='SAME',                 # 64 features for each 5x5 patch
-        #             W_init=W_init, name ='cnn2')           # output: (batch_size, 12, 12, 64)
         net = LocalResponseNormLayer(net, depth_radius=4, bias=1.0,
                     alpha=0.001 / 9.0, beta=0.75, name='norm2')
-        # net.outputs = tf.nn.lrn(net.outputs, 4, bias=1.0, alpha=0.001 / 9.0,
-        #             beta=0.75, name='norm2')
         net = MaxPool2d(net, (3, 3), (2, 2), padding='SAME',name='pool2')
-        # net = PoolLayer(net, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
-        #             padding='SAME', pool = tf.nn.max_pool, name ='pool2') # output: (batch_size, 6, 6, 64)
+
         net = FlattenLayer(net, name='flatten')                             # output: (batch_size, 2304)
         net = DenseLayer(net, n_units=384, act=tf.nn.relu,
                     W_init=W_init2, b_init=b_init2, name='relu1')           # output: (batch_size, 384)
@@ -237,70 +184,9 @@ def model(x_crop, y_, reuse):
 
         return net, cost, acc
 
-def model_batch_norm(x_crop, y_, reuse, is_train):
-    """ Batch normalization should be placed before rectifier. """
-    W_init = tf.truncated_normal_initializer(stddev=5e-2)
-    W_init2 = tf.truncated_normal_initializer(stddev=0.04)
-    b_init2 = tf.constant_initializer(value=0.1)
-    with tf.variable_scope("model", reuse=reuse):
-        tl.layers.set_name_reuse(reuse)
-        net = InputLayer(x_crop, name='input')
-
-        net = Conv2d(net, 64, (5, 5), (1, 1), padding='SAME',
-                    W_init=W_init, b_init=None, name='cnn1')
-        # net = Conv2dLayer(net, act=tf.identity, shape=[5, 5, 3, 64],
-        #             strides=[1, 1, 1, 1], padding='SAME',                 # 64 features for each 5x5x3 patch
-        #             W_init=W_init, b_init=None, name='cnn1')              # output: (batch_size, 24, 24, 64)
-        net = BatchNormLayer(net, is_train, act=tf.nn.relu, name='batch1')
-        net = MaxPool2d(net, (3, 3), (2, 2), padding='SAME',name='pool1')
-        # net = PoolLayer(net, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
-        #             padding='SAME', pool=tf.nn.max_pool, name='pool1',)   # output: (batch_size, 12, 12, 64)
-
-        net = Conv2d(net, 64, (5, 5), (1, 1), padding='SAME',
-                    W_init=W_init, b_init=None, name='cnn2')
-        # net = Conv2dLayer(net, act=tf.identity, shape=[5, 5, 64, 64],
-        #             strides=[1, 1, 1, 1], padding='SAME',                 # 64 features for each 5x5 patch
-        #             W_init=W_init, b_init=None, name ='cnn2')             # output: (batch_size, 12, 12, 64)
-        net = BatchNormLayer(net, is_train, act=tf.nn.relu, name='batch2')
-        net = MaxPool2d(net, (3, 3), (2, 2), padding='SAME',name='pool2')
-        # net = PoolLayer(net, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1],
-        #            padding='SAME', pool = tf.nn.max_pool, name ='pool2')  # output: (batch_size, 6, 6, 64)
-
-        net = FlattenLayer(net, name='flatten')                             # output: (batch_size, 2304)
-        net = DenseLayer(net, n_units=384, act=tf.nn.relu,
-                    W_init=W_init2, b_init=b_init2, name='relu1')           # output: (batch_size, 384)
-        net = DenseLayer(net, n_units=192, act = tf.nn.relu,
-                    W_init=W_init2, b_init=b_init2, name='relu2')           # output: (batch_size, 192)
-        net = DenseLayer(net, n_units=10, act = tf.identity,
-                    W_init=tf.truncated_normal_initializer(stddev=1/192.0),
-                    name='output')                                          # output: (batch_size, 10)
-        y = net.outputs
-
-        ce = tl.cost.cross_entropy(y, y_, name='cost')
-        # L2 for the MLP, without this, the accuracy will be reduced by 15%.
-        L2 = tf.contrib.layers.l2_regularizer(0.004)(net.all_params[4]) + \
-                tf.contrib.layers.l2_regularizer(0.004)(net.all_params[6])
-        cost = ce + L2
-
-        # correct_prediction = tf.equal(tf.argmax(tf.nn.softmax(y), 1), y_)
-        correct_prediction = tf.equal(tf.cast(tf.argmax(y, 1), tf.int32), y_)
-        acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-        return net, cost, acc
-
-## You can also use placeholder to feed_dict in data after using
-## val, l = sess.run([x_train_batch, y_train_batch]) to get the data
-# x_crop = tf.placeholder(tf.float32, shape=[batch_size, 24, 24, 3])
-# y_ = tf.placeholder(tf.int32, shape=[batch_size,])
-# cost, acc, network = model(x_crop, y_, None)
-
-# with tf.device('/gpu:0'): # <-- remove it if you don't have GPU
-# network in gpu
+# with tf.device('/gpu:0'): 
 network, cost, acc, = model(x_train_batch, y_train_batch, False)
 _, cost_test, acc_test = model(x_test_batch, y_test_batch, True)
-# you may want to try batch normalization
-# network, cost, acc, = model_batch_norm(x_train_batch, y_train_batch, None, is_train=True)
-# _, cost_test, acc_test = model_batch_norm(x_test_batch, y_test_batch, True, is_train=False)
 
 ## train
 n_epoch = 50000
@@ -333,10 +219,6 @@ with tf.device('/gpu:0'):   # <-- remove it if you don't have GPU
         start_time = time.time()
         train_loss, train_acc, n_batch = 0, 0, 0
         for s in range(n_step_epoch):
-            ## You can also use placeholder to feed_dict in data after using
-            # val, l = sess.run([x_train_batch, y_train_batch])
-            # tl.visualize.images2d(val, second=3, saveable=False, name='batch', dtype=np.uint8, fig_idx=2020121)
-            # err, ac, _ = sess.run([cost, acc, train_op], feed_dict={x_crop: val, y_: l})
             err, ac, _ = sess.run([cost, acc, train_op])
             step += 1; train_loss += err; train_acc += ac; n_batch += 1
 
