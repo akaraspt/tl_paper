@@ -1,8 +1,8 @@
 # Experiments for ACM MM Open Source Software Competition
 
 ## Raw Performance
-* TensorFlow implementation [click](https://www.tensorflow.org/tutorials/deep_cnn)
-* TensorLayer implementation [click](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py)
+* [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
+* [TensorLayer Implementation](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py)
 
 ## Deep Reinforcement Learning
 * Install OpenAI gym
