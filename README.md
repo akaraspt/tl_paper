@@ -18,4 +18,4 @@
 
 ## More
 * [Documentation](http://tensorlayer.readthedocs.io)
-* [Examples](http://tensorlayer.readthedocs.io/en/latest/user/example.html)
+* [Examples and Applications](http://tensorlayer.readthedocs.io/en/latest/user/example.html)
