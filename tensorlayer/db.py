@@ -127,7 +127,11 @@ class TensorDB(object):
         """
         self.__autofill(args)
         s = time.time()
-        f_id = self.paramsfs.put(self.__serialization(params))#, file_name=file_name)
+        d = self.__serialization(params)
+        print('seri time', time.time()-s)
+        s = time.time()
+        f_id = self.paramsfs.put(d)#, file_name=file_name)
+        print('save time', time.time()-s)
         args.update({'f_id': f_id, 'time': datetime.utcnow()})
         self.db.Params.insert_one(args)
         # print("[TensorDB] Save params: {} SUCCESS, took: {}s".format(file_name, round(time.time()-s, 2)))
@@ -157,12 +161,17 @@ class TensorDB(object):
         else:
             print("[TensorDB] FAIL! Cannot find: {}".format(args))
             return False, False
-        try:
-            params = self.__deserialization(self.paramsfs.get(f_id).read())
-            print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))
-            return params, f_id
-        except:
-            return False, False
+        # try:s
+        s = time.time()
+        d = self.paramsfs.get(f_id).read()
+        print('get time', time.time()-s)
+        s = time.time()
+        params = self.__deserialization(d)
+        print('deseri time', time.time()-s)
+        print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))
+        return params, f_id
+        # except:
+        #     return False, False
 
     @AutoFill
     def find_all_params(self, args={}):
