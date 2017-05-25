@@ -42,8 +42,8 @@ render = False  # display the game environment
 model_file_name = "model_pong"
 np.set_printoptions(threshold=np.nan)
 
-# db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None)
-db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour')
+# db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
+db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='tensorlayer123')
 
 
 def prepro(I):
@@ -67,9 +67,9 @@ xs, ys, rs = [], [], []
 # observation for training and inference
 states_batch_pl = tf.placeholder(tf.float32, shape=[None, D])
 # policy network
-net = tl.layers.InputLayer(states_batch_pl, name='input_layer')
+net = tl.layers.InputLayer(states_batch_pl, name='input')
 net = tl.layers.DenseLayer(net, n_units=H, act=tf.nn.relu, name='relu1')
-net = tl.layers.DenseLayer(net, n_units=3, act=tf.identity, name='output_layer')
+net = tl.layers.DenseLayer(net, n_units=3, act=tf.identity, name='output')
 probs = net.outputs
 sampling_prob = tf.nn.softmax(probs)
 
