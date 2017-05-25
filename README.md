@@ -23,10 +23,10 @@
 * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
 * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
 * Run the experiment
- * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
- * For distributed mode.
-   * xx
-   * xx
+  * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
+  * For distributed mode.
+    * xx
+    * xx
 
 ## Hyper-parameter selection and cross-validation
 * Hi Akara, if this part is in another repo, please link it
