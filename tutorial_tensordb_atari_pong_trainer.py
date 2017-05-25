@@ -1,7 +1,5 @@
 #! /usr/bin/python
 # -*- coding: utf8 -*-
-
-
 """
 To understand Reinforcement Learning, we let computer to learn how to play
 Pong game from the original screen inputs. Before we start, we highly recommend
@@ -20,13 +18,11 @@ Link
 http://karpathy.github.io/2016/05/31/rl/
 
 """
-
 import tensorflow as tf
 import tensorlayer as tl
 import gym
 import numpy as np
 import time
-
 # hyperparameters
 image_size = 80
 D = image_size * image_size
@@ -43,7 +39,6 @@ np.set_printoptions(threshold=np.nan)
 from tensorlayer.db import TensorDB
 # db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
 db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='tensorlayer123')
-
 
 # def prepro(I):
 #     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -135,15 +130,3 @@ with tf.Session() as sess:
 
         db.del_params(args={'type': 'parameters'})
         db.save_params(sess.run(net.all_params), args={'type': 'parameters'})#, file_name='parameters')
-
-
-
-
-
-
-
-
-
-
-
-#
