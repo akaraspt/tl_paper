@@ -35,7 +35,7 @@ model_file_name = "model_pong"
 np.set_printoptions(threshold=np.nan)
 
 # db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='tensorlayer123')
+db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123')
 
 def prepro(I):
     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -114,7 +114,7 @@ with tf.Session() as sess:
 
                 print("[*] Generated {} examples".format(epx.shape[0]))
 
-                f_id = db.save_params([epx, epy, epr], args={'type': 'train'})  # , file_name='train_data')
+                f_id = db.save_params([epx, epy, epr], args={'type': 'train_data'})  # , file_name='train_data')
 
             # if episode_number % (batch_size * 100) == 0:
             #     tl.files.save_npz(net.all_params, name=model_file_name+'.npz')
@@ -133,7 +133,7 @@ with tf.Session() as sess:
             start_time = time.time()
 
             if (episode_number % 1 == 0) and (game_number == 0):  ## Update model from Trainer
-                params, f = db.find_one_params(args={'type': 'parameters'})
+                params, f = db.find_one_params(args={'type': 'network_parameters'})
                 if (params is not False):
                     tl.files.assign_params(sess, params, net)
                     print("[*] Update Model")

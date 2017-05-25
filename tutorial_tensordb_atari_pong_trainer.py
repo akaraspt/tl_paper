@@ -33,7 +33,7 @@ np.set_printoptions(threshold=np.nan)
 
 from tensorlayer.db import TensorDB
 # db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='tensorlayer123')
+db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123')
 
 # def prepro(I):
 #     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -83,7 +83,7 @@ with tf.Session() as sess:
         is_found = False
         while is_found is False:
             ## read one
-            data, f_id = db.find_one_params(args={'type': 'train'})
+            data, f_id = db.find_one_params(args={'type': 'train_data'})
             if (data is not False):
                 epx, epy, epr = data
                 db.del_params(args={'type': 'train', 'f_id': f_id})
@@ -121,5 +121,5 @@ with tf.Session() as sess:
                                 round(total_n_examples/(time.time() - start_time), 2)))
         n += 1
 
-        db.del_params(args={'type': 'parameters'})
-        db.save_params(sess.run(net.all_params), args={'type': 'parameters'})#, file_name='parameters')
+        db.del_params(args={'type': 'network_parameters'})
+        db.save_params(sess.run(net.all_params), args={'type': 'network_parameters'})#, file_name='network_parameters')
