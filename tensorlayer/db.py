@@ -402,6 +402,29 @@ class TensorDB(object):
 
         return temp
 
+    @AutoFill
+    def get_all_jobs(self, args={}):
+        """ Get all parameter from MongoDB Buckets
+        Returns
+        --------
+        params : the parameters, return False if nothing found.
+        """
+
+
+        s = time.time()
+        cursor = self.db.Job.find({})
+
+        jobs = []
+        if cursor is not None:
+            for job in cursor: # you may have multiple Buckets files
+                jobs.append(job)
+        else:
+            print("[TensorDB] FAIL! There is no job")
+            return False
+
+        print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))
+        return jobs
+
     def push_job(self,margs, wargs,dargs,epoch):
 
         ms,mid=self.load_model_architecture(margs)
