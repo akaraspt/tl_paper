@@ -5,7 +5,8 @@
   * `pip2 install tensorflow-gpu`
 * Install Database
   * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
-* Python2
+  * We recommend to use one machine as database server.
+* Python2 packages
   * `pip2 install pymongo gym numpy matplotlib scipy scikit-image`
   * `pi2 install gym[all]`
 
