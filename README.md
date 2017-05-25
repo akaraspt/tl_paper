@@ -16,8 +16,8 @@
 * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) (5x faster, optimize CPU/GPU operation, tested on Titan X Pascal)
 
 ## Start Workers
-* For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use distributed mode.
-* Setup environment in all workers
+For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use distributed mode.
+* Install MongoDB in one machine, setup environment in all other machines.
 * xx
 * xx
 
@@ -26,9 +26,7 @@
 * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
 * Run the experiment
   * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
-  * For distributed mode.
-    * Install MongoDB in one machine, setup environment in all other machines.
-    * One machine run one trainer with GPU, all other machines run data generator.
+  * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
 
 ## Hyper-parameter selection and cross-validation
 * Hi Akara, if this part is in another repo, please link it
