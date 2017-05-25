@@ -16,7 +16,6 @@ more memory if the observation is very large.)
 Link
 -----
 http://karpathy.github.io/2016/05/31/rl/
-
 """
 import tensorflow as tf
 import tensorlayer as tl
