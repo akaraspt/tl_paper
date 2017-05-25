@@ -8,7 +8,8 @@
   * We recommend to use one machine as database server.
 * Python2 packages
   * `pip2 install pymongo gym numpy matplotlib scipy scikit-image`
-  * `pip2 install gym[all]` or `pip2 install "gym[atari]"` (to install atari only)
+  * `sudo apt-get install swig cmake`
+  * `pip2 install gym[atari]` or `pip2 install gym[all]` 
 
 ## Raw Performance
 * Run this experiment in solo mode.
