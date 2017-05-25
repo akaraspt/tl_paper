@@ -16,5 +16,5 @@ NUMBER_WORKER = 10
 for i in range(NUMBER_WORKER):
     ID = str(i).zfill(2)
     print("Start worker: " + ID)
-    os.system("sshpass -p {} scp {} dsigdo@gdo{}.doc.ic.ac.uk:{}".format(ID, PASSWORD, FILE_LOCATION, TARGET_LOCATION))
-    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'python3 {}/{} &'".format(ID, PASSWORD, TARGET_LOCATION, FILE_LOCATION))
+    os.system("sshpass -p {} scp {} dsigdo@gdo{}.doc.ic.ac.uk:{}".format(PASSWORD, FILE_LOCATION, ID, TARGET_LOCATION))
+    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'python3 {}/{} &'".format(PASSWORD, ID, TARGET_LOCATION, FILE_LOCATION))
