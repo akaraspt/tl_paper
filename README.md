@@ -9,6 +9,8 @@
 * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
 * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) 5x faster, same accuracy, tested on Titan X Pascal
 
+## Start Workers
+
 ## Deep Reinforcement Learning
 * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
 * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
