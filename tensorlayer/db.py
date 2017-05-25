@@ -1,8 +1,9 @@
 #! /usr/bin/python
 # -*- coding: utf8 -*-
 """
-Experimental Database Management System
+Experimental Database Management System.
 
+Latest Version
 """
 
 
@@ -36,7 +37,7 @@ def AutoFill(func):
 
 
 class TensorDB(object):
-    """TensorDB is a MongoDB based manager that help you to manage data, model and logging.
+    """TensorDB is a MongoDB based manager that help you to manage data, network topology, parameters and logging.
 
     Parameters
     -------------
@@ -56,6 +57,7 @@ class TensorDB(object):
     db.TrainLog : Collection for
     db.ValidLog : Collection for
     db.TestLog : Collection for
+    studyID : string, unique ID, if None random generate one.
 
     Dependencies
     -------------
@@ -95,91 +97,12 @@ class TensorDB(object):
         self.paramsfs = gridfs.GridFS(self.db, collection="paramsfs")
         self.archfs=gridfs.GridFS(self.db,collection="ModelArchitecture")
         ##
-        print("[TensorDB] Connect SUCCESS {}:{} {} {}".format(ip, port, db_name, user_name))
+        print("[TensorDB] Connect SUCCESS {}:{} {} {} {}".format(ip, port, db_name, user_name, studyID))
 
         self.ip = ip
         self.port = port
         self.db_name = db_name
         self.user_name = user_name
-
-    # def save_bulk_data(self, data=None, filename='filename'):
-    #     """ Put bulk data into TensorDB.datafs, return file ID.
-    #     When you have a very large data, you may like to save it into GridFS Buckets
-    #     instead of Collections, then when you want to load it, XXXX
-    #
-    #     Parameters
-    #     -----------
-    #     data : serialized data.
-    #     filename : string, GridFS Buckets.
-    #
-    #     References
-    #     -----------
-    #     - MongoDB find, xxxxx
-    #     """
-    #     s = time.time()
-    #     f_id = self.datafs.put(data, filename=filename)
-    #     print("[TensorDB] save_bulk_data: {} took: {}s".format(filename, round(time.time()-s, 2)))
-    #     return f_id
-    #
-    # def save_collection(self, data=None, collect_name='collect_name'):
-    #     """ Insert data into MongoDB Collections, return xx.
-    #
-    #     Parameters
-    #     -----------
-    #     data : serialized data.
-    #     collect_name : string, MongoDB collection name.
-    #
-    #     References
-    #     -----------
-    #     - MongoDB find, xxxxx
-    #     """
-    #     s = time.time()
-    #     rl = self.db[collect_name].insert_many(data)
-    #     print("[TensorDB] save_collection: {} took: {}s".format(collect_name, round(time.time()-s, 2)))
-    #     return rl
-    #
-    # def find(self, args={}, collect_name='collect_name'):
-    #     """ Find data from MongoDB Collections.
-    #
-    #     Parameters
-    #     -----------
-    #     args : dictionary, arguments for finding.
-    #     collect_name : string, MongoDB collection name.
-    #
-    #     References
-    #     -----------
-    #     - MongoDB find, xxxxx
-    #     """
-    #     s = time.time()
-    #
-    #     pc = self.db[collect_name].find(args)  # pymongo.cursor.Cursor object
-    #     flist = pc.distinct('f_id')
-    #     fldict = {}
-    #     for f in flist: # you may have multiple Buckets files
-    #         # fldict[f] = pickle.loads(self.datafs.get(f).read())
-    #         # s2 = time.time()
-    #         tmp = self.datafs.get(f).read()
-    #         # print(time.time()-s2)
-    #         fldict[f] = pickle.loads(tmp)
-    #         # print(time.time()-s2)
-    #         # exit()
-    #     # print(round(time.time()-s, 2))
-    #     data = [fldict[x['f_id']][x['id']] for x in pc]
-    #     data = np.asarray(data)
-    #     print("[TensorDB] find: {} get: {} took: {}s".format(collect_name, pc.count(), round(time.time()-s, 2)))
-    #     return data
-
-    # def del_data(self, data, args={}):
-    #     pass
-    #
-    # def save_model(self):
-    #     pass
-    #
-    # def load_model(self):
-    #     pass
-    #
-    # def del_model(self):
-    #     pass
 
     def __autofill(self,args):
         return args.update({'studyID':self.studyID})
@@ -202,7 +125,6 @@ class TensorDB(object):
         ---------
         f_id : the Buckets ID of the parameters.
         """
-
         self.__autofill(args)
         s = time.time()
         f_id = self.paramsfs.put(self.__serialization(params))#, file_name=file_name)
@@ -291,7 +213,6 @@ class TensorDB(object):
 
         print("[TensorDB] Delete params SUCCESS: {}".format(args))
 
-
     def _print_dict(self, args):
         # return " / ".join(str(key) + ": "+ str(value) for key, value in args.items())
 
@@ -301,64 +222,7 @@ class TensorDB(object):
                 string += str(key) + ": "+ str(value) + " / "
         return string
 
-    @AutoFill
-    def save_job(self, script=None, args={}):
-        """Save the job.
-
-        Parameters
-        -----------
-        script : a script file name or None.
-        args : dictionary, items to save.
-
-        Examples
-        ---------
-        >>> # Save your job
-        >>> db.save_job('your_script.py', {'job_id': 1, 'learning_rate': 0.01, 'n_units': 100})
-        >>> # Run your job
-        >>> temp = db.find_one_job(args={'job_id': 1})
-        >>> print(temp['learning_rate'])
-        ... 0.01
-        >>> import _your_script
-        ... running your script
-        """
-        self.__autofill(args)
-        if script is not None:
-            _script = open(script, 'rb').read()
-            args.update({'script': _script, 'script_name': script})
-        # _result = self.db.Job.insert_one(args)
-        _result = self.db.Job.replace_one(args, args, upsert=True)
-        _log = self._print_dict(args)
-        print("[TensorDB] Save Job: script={}, args={}".format(script, args))
-        return _result
-
-    @AutoFill
-    def find_one_job(self, args={}):
-        """ Find one job from MongoDB Job Collections.
-
-        Parameters
-        ----------
-        args : dictionary, find items.
-
-        Returns
-        --------
-        dictionary : contains all meta data and script.
-        """
-
-
-        temp = self.db.Job.find_one(args)
-
-        if temp is not None:
-            if 'script_name' in temp.keys():
-                f = open('_' + temp['script_name'], 'wb')
-                f.write(temp['script'])
-                f.close()
-            print("[TensorDB] Find Job: {}".format(args))
-        else:
-            print("[TensorDB] FAIL! Cannot find any: {}".format(args))
-            return False
-
-        return temp
-
+    ## =========================== LOG =================================== ##
     @AutoFill
     def train_log(self, args={}):
         """Save the training log.
@@ -450,11 +314,7 @@ class TensorDB(object):
         self.db.TestLog.delete_many(args)
         print("[TensorDB] Delete TestLog SUCCESS")
 
-    def __str__(self):
-        _s = "[TensorDB] Info:\n"
-        _t = _s + "    " + str(self.db)
-        return _t
-
+    ## =========================== Network Architecture ================== ##
     @AutoFill
     def save_model_architecture(self,s,args={}):
         self.__autofill(args)
@@ -484,6 +344,63 @@ class TensorDB(object):
             print(e)
             return False, False
 
+    @AutoFill
+    def save_job(self, script=None, args={}):
+        """Save the job.
+
+        Parameters
+        -----------
+        script : a script file name or None.
+        args : dictionary, items to save.
+
+        Examples
+        ---------
+        >>> # Save your job
+        >>> db.save_job('your_script.py', {'job_id': 1, 'learning_rate': 0.01, 'n_units': 100})
+        >>> # Run your job
+        >>> temp = db.find_one_job(args={'job_id': 1})
+        >>> print(temp['learning_rate'])
+        ... 0.01
+        >>> import _your_script
+        ... running your script
+        """
+        self.__autofill(args)
+        if script is not None:
+            _script = open(script, 'rb').read()
+            args.update({'script': _script, 'script_name': script})
+        # _result = self.db.Job.insert_one(args)
+        _result = self.db.Job.replace_one(args, args, upsert=True)
+        _log = self._print_dict(args)
+        print("[TensorDB] Save Job: script={}, args={}".format(script, args))
+        return _result
+
+    @AutoFill
+    def find_one_job(self, args={}):
+        """ Find one job from MongoDB Job Collections.
+
+        Parameters
+        ----------
+        args : dictionary, find items.
+
+        Returns
+        --------
+        dictionary : contains all meta data and script.
+        """
+
+
+        temp = self.db.Job.find_one(args)
+
+        if temp is not None:
+            if 'script_name' in temp.keys():
+                f = open('_' + temp['script_name'], 'wb')
+                f.write(temp['script'])
+                f.close()
+            print("[TensorDB] Find Job: {}".format(args))
+        else:
+            print("[TensorDB] FAIL! Cannot find any: {}".format(args))
+            return False
+
+        return temp
 
     def push_job(self,margs, wargs,dargs,epoch):
 
@@ -511,11 +428,80 @@ class TensorDB(object):
     def run_job(self,jid):
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Since":datetime.utcnow()}})
 
-
-
     def del_job(self,jid):
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Finished":datetime.utcnow()}})
 
+    def __str__(self):
+        _s = "[TensorDB] Info:\n"
+        _t = _s + "    " + str(self.db)
+        return _t
+
+    # def save_bulk_data(self, data=None, filename='filename'):
+    #     """ Put bulk data into TensorDB.datafs, return file ID.
+    #     When you have a very large data, you may like to save it into GridFS Buckets
+    #     instead of Collections, then when you want to load it, XXXX
+    #
+    #     Parameters
+    #     -----------
+    #     data : serialized data.
+    #     filename : string, GridFS Buckets.
+    #
+    #     References
+    #     -----------
+    #     - MongoDB find, xxxxx
+    #     """
+    #     s = time.time()
+    #     f_id = self.datafs.put(data, filename=filename)
+    #     print("[TensorDB] save_bulk_data: {} took: {}s".format(filename, round(time.time()-s, 2)))
+    #     return f_id
+    #
+    # def save_collection(self, data=None, collect_name='collect_name'):
+    #     """ Insert data into MongoDB Collections, return xx.
+    #
+    #     Parameters
+    #     -----------
+    #     data : serialized data.
+    #     collect_name : string, MongoDB collection name.
+    #
+    #     References
+    #     -----------
+    #     - MongoDB find, xxxxx
+    #     """
+    #     s = time.time()
+    #     rl = self.db[collect_name].insert_many(data)
+    #     print("[TensorDB] save_collection: {} took: {}s".format(collect_name, round(time.time()-s, 2)))
+    #     return rl
+    #
+    # def find(self, args={}, collect_name='collect_name'):
+    #     """ Find data from MongoDB Collections.
+    #
+    #     Parameters
+    #     -----------
+    #     args : dictionary, arguments for finding.
+    #     collect_name : string, MongoDB collection name.
+    #
+    #     References
+    #     -----------
+    #     - MongoDB find, xxxxx
+    #     """
+    #     s = time.time()
+    #
+    #     pc = self.db[collect_name].find(args)  # pymongo.cursor.Cursor object
+    #     flist = pc.distinct('f_id')
+    #     fldict = {}
+    #     for f in flist: # you may have multiple Buckets files
+    #         # fldict[f] = pickle.loads(self.datafs.get(f).read())
+    #         # s2 = time.time()
+    #         tmp = self.datafs.get(f).read()
+    #         # print(time.time()-s2)
+    #         fldict[f] = pickle.loads(tmp)
+    #         # print(time.time()-s2)
+    #         # exit()
+    #     # print(round(time.time()-s, 2))
+    #     data = [fldict[x['f_id']][x['id']] for x in pc]
+    #     data = np.asarray(data)
+    #     print("[TensorDB] find: {} get: {} took: {}s".format(collect_name, pc.count(), round(time.time()-s, 2)))
+    #     return data
 
 
 

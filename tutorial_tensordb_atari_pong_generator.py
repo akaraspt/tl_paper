@@ -26,16 +26,16 @@ image_size = 80
 D = image_size * image_size
 H = 200
 batch_size = 10
-learning_rate = 1e-4
+# learning_rate = 1e-4
 gamma = 0.99
-decay_rate = 0.99
+# decay_rate = 0.99
 render = False  # display the game environment
 # resume = False      # load existing policy network
 model_file_name = "model_pong"
 np.set_printoptions(threshold=np.nan)
 
 # db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123')
+db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123', studyID='1')
 
 def prepro(I):
     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """

@@ -33,7 +33,7 @@ np.set_printoptions(threshold=np.nan)
 
 from tensorlayer.db import TensorDB
 # db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123')
+db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123', studyID='1')
 
 # def prepro(I):
 #     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -86,7 +86,7 @@ with tf.Session() as sess:
             data, f_id = db.find_one_params(args={'type': 'train_data'})
             if (data is not False):
                 epx, epy, epr = data
-                db.del_params(args={'type': 'train', 'f_id': f_id})
+                db.del_params(args={'type': 'train_data', 'f_id': f_id})
                 is_found = True
             else:
                 # print("Waiting training data")
