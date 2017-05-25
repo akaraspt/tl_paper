@@ -2,11 +2,12 @@
 
 ## Setup Environment
 * TensorFlow 1.0
-* Install OpenAI gym
-* Install MongoDB
+  * `pip2 install tensorflow-gpu`
+* Install Database
+  * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
 * Python2
-  * pip2 install pymongo gym numpy matplotlib scipy scikit-image
-  * pi2 install gym[all]
+  * `pip2 install pymongo gym numpy matplotlib scipy scikit-image`
+  * `pi2 install gym[all]`
 
 ## Raw Performance
 * Run this experiment in solo mode.
@@ -25,8 +26,8 @@
 * Run the experiment
   * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
   * For distributed mode.
-    * xx
-    * xx
+    * Install MongoDB in one machine, setup environment in all other machines.
+    * One machine run one trainer with GPU, all other machines run data generator.
 
 ## Hyper-parameter selection and cross-validation
 * Hi Akara, if this part is in another repo, please link it
