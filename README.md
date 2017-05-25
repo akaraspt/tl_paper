@@ -4,8 +4,9 @@
 * TensorFlow 1.0
 * Install OpenAI gym
 * Install MongoDB
-* Python3
-  * pip3 install pymongo gym numpy matplotlib scipy scikit-image
+* Python2
+  * pip2 install pymongo gym numpy matplotlib scipy scikit-image
+  * pi2 install gym[all]
 
 ## Raw Performance
 * Run this experiment in solo mode.
