@@ -9,10 +9,6 @@ using python-numpy and OpenAI gym environment.
 
 The code here is the reimplementation of Karpathy's Blog by using TensorLayer.
 
-Compare with Karpathy's code, we store observation for a batch, he store
-observation for a episode only, they store gradients instead. (so we will use
-more memory if the observation is very large.)
-
 Link
 -----
 http://karpathy.github.io/2016/05/31/rl/
