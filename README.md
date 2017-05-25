@@ -37,3 +37,4 @@ For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-valid
 ## More
 * [Documentation](http://tensorlayer.readthedocs.io)
 * [Examples and Applications](http://tensorlayer.readthedocs.io/en/latest/user/example.html)
+* [Github](https://github.com/zsdonghao/tensorlayer)
