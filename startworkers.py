@@ -39,4 +39,4 @@ for i in range(1, NUMBER_WORKER+1):
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'sudo dpkg --configure -a'".format(PASSWORD, ID))
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'sudo apt-get install cmake swig'".format(PASSWORD, ID))
     # kill python
-    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'killall python'".format(PASSWORD, ID))
+    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'killall Python'".format(PASSWORD, ID))

@@ -121,5 +121,6 @@ with tf.Session() as sess:
                                 round(total_n_examples/(time.time() - start_time), 2)))
         n += 1
 
-        db.del_params(args={'type': 'network_parameters'})
-        db.save_params(sess.run(net.all_params), args={'type': 'network_parameters'})#, file_name='network_parameters')
+        if n % 10 == 0:
+            db.del_params(args={'type': 'network_parameters'})
+            db.save_params(sess.run(net.all_params), args={'type': 'network_parameters'})#, file_name='network_parameters')

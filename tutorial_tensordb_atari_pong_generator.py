@@ -17,7 +17,9 @@ import tensorflow as tf
 import tensorlayer as tl
 import gym
 import numpy as np
-import time
+import time, os
+
+os.environ["CUDA_VISIBLE_DEVICES"]=""  # CPU
 
 from tensorlayer.db import TensorDB
 
