@@ -119,22 +119,22 @@ class TensorDB(object):
         f_id : the Buckets ID of the parameters.
         """
         self.__autofill(args)
-        s = time.time()
+        st = time.time()
         d = self.__serialization(params)
-        print('seri time', time.time()-s)
+        # print('seri time', time.time()-st)
 
         if lz4_comp:
-            s = time.time()
+            # s = time.time()
             d = compress(d, compression_level=3)
-            print('comp time', time.time()-s)
+            # print('comp time', time.time()-s)
 
-        s = time.time()
+        # s = time.time()
         f_id = self.paramsfs.put(d)#, file_name=file_name)
-        print('save time', time.time()-s)
+        # print('save time', time.time()-s)
         args.update({'f_id': f_id, 'time': datetime.utcnow()})
         self.db.Params.insert_one(args)
         # print("[TensorDB] Save params: {} SUCCESS, took: {}s".format(file_name, round(time.time()-s, 2)))
-        print("[TensorDB] Save params: SUCCESS, took: {}s".format(round(time.time()-s, 2)))
+        print("[TensorDB] Save params: SUCCESS, took: {}s".format(round(time.time()-st, 2)))
         return f_id
 
     @AutoFill
@@ -158,21 +158,20 @@ class TensorDB(object):
             print("[TensorDB] Cannot find: {}".format(args))
             return False, False
 
-        s = time.time()
+        st = time.time()
         d = self.paramsfs.get(f_id).read()
-        print('get time', time.time()-s)
+        # print('get time', time.time()-st)
 
         if lz4_decomp:
-            s = time.time()
+            # s = time.time()
             d = decompress(d)
-            print('decomp time', time.time()-s)
+            # print('decomp time', time.time()-s)
 
-        s = time.time()
+        # s = time.time()
         params = self.__deserialization(d)
-        print(len(params))
-        print('deseri time', time.time()-s)
+        # print('deseri time', time.time()-s)
 
-        print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))
+        print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-st, 2)))
         return params, f_id
 
     @AutoFill
@@ -188,7 +187,7 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
 
         """
-        s = time.time()
+        st = time.time()
         pc = self.db.Params.find(args)
 
         if pc is not None:
@@ -203,7 +202,7 @@ class TensorDB(object):
             print("[TensorDB] Cannot find: {}".format(args))
             return False
 
-        print("[TensorDB] Find all params SUCCESS, took: {}s".format(round(time.time()-s, 2)))
+        print("[TensorDB] Find all params SUCCESS, took: {}s".format(round(time.time()-st, 2)))
         return params
 
     @AutoFill
@@ -357,7 +356,7 @@ class TensorDB(object):
 
     @AutoFill
     def save_job(self, script=None, args={}):
-        """Save the job.
+        """ Save customized job.
 
         Parameters
         -----------
@@ -433,8 +432,8 @@ class TensorDB(object):
         print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))
         return jobs
 
-    def push_job(self,margs, wargs,dargs,epoch):
-        """ """
+    def push_job(self, margs, wargs ,dargs, epoch):
+        """ Generate a new job. """
         ms, mid = self.load_model_architecture(margs)
         weight, wid = self.find_one_params(wargs)
         args = {"weight": wid, "model": mid, "dargs": dargs, "epoch": epoch, "time": datetime.utcnow(), "Running": False}
@@ -442,7 +441,7 @@ class TensorDB(object):
         self.db.JOBS.insert_one(args)
 
     def peek_job(self):
-        """ """
+        """ Check whether a job exists. """
         args={'Running':False}
         self.__autofill(args)
         m=self.db.JOBS.find_one(args)
@@ -458,11 +457,11 @@ class TensorDB(object):
         return m['_id'], ach,w,m["dargs"],m['epoch']
 
     def run_job(self,jid):
-        """ """
+        """ Set a job as running. """
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Since":datetime.utcnow()}})
 
     def del_job(self,jid):
-        """ """
+        """ Set a job as finished. """
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Finished":datetime.utcnow()}})
 
     def __str__(self):
