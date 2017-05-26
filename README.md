@@ -2,14 +2,17 @@
 
 ## Setup Environment
 * TensorFlow 1.0
-  * `pip2 install tensorflow-gpu`
+  * `pip install tensorflow-gpu`
+* TensorLayer 
+  * It is self-contained
+  * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
 * Install Database
   * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
   * We recommend to use one machine as database server.
-* Python2 packages
-  * `pip2 install pymongo gym numpy matplotlib scipy scikit-image`
+* Python packages
+  * `pip install pymongo gym numpy matplotlib scipy scikit-image lz4`
   * `sudo apt-get install swig cmake`
-  * `pip2 install gym[atari]` or `pip2 install gym[all]` 
+  * `pip install gym[atari]` or `pip install gym[all]` 
 
 ## Raw Performance
 * Run this experiment in solo mode.

@@ -30,13 +30,13 @@ TARGET_LOCATION='/home/dsigdo/Workspace'
 NUMBER_WORKER = 32
 for i in range(1, NUMBER_WORKER+1):
     ID = str(i).zfill(2)
-    print("Start worker: " + ID)
+    print("Start worker ============================================= " + ID)
     # os.system("sshpass -p {} scp {} dsigdo@gdo{}.doc.ic.ac.uk:{}".format(PASSWORD, FILE_LOCATION, ID, TARGET_LOCATION))
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'python3 {}/{} &'".format(PASSWORD, ID, TARGET_LOCATION, FILE_LOCATION))
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'sudo apt-get install cmake'".format(PASSWORD, ID))
-    # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'pip install gym[atari]'".format(PASSWORD, ID))
+    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'pip install lz4'".format(PASSWORD, ID))
 
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'sudo dpkg --configure -a'".format(PASSWORD, ID))
     # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'sudo apt-get install cmake swig'".format(PASSWORD, ID))
     # kill python
-    os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'killall Python'".format(PASSWORD, ID))
+    # os.system("sshpass -p {} ssh -t dsigdo@gdo{}.doc.ic.ac.uk 'killall Python'".format(PASSWORD, ID))
