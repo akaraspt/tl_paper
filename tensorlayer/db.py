@@ -10,7 +10,7 @@ import tensorlayer as tl
 import numpy as np
 import time
 import math
-
+from lz4.frame import compress, decompress
 
 import uuid
 
@@ -106,7 +106,7 @@ class TensorDB(object):
     def __deserialization(self,ps):
         return pickle.loads(ps)
 
-    def save_params(self, params=[], args={}):#, file_name='parameters'):
+    def save_params(self, params=[], args={}, lz4_comp=False):#, file_name='parameters'):
         """ Save parameters into MongoDB Buckets, and save the file ID into Params Collections.
 
         Parameters
@@ -122,6 +122,12 @@ class TensorDB(object):
         s = time.time()
         d = self.__serialization(params)
         print('seri time', time.time()-s)
+
+        if lz4_comp:
+            s = time.time()
+            d = compress(d, compression_level=3)
+            print('comp time', time.time()-s)
+
         s = time.time()
         f_id = self.paramsfs.put(d)#, file_name=file_name)
         print('save time', time.time()-s)
@@ -132,7 +138,7 @@ class TensorDB(object):
         return f_id
 
     @AutoFill
-    def find_one_params(self, args={},sort=None):
+    def find_one_params(self, args={}, sort=None, lz4_decomp=False):
         """ Find one parameter from MongoDB Buckets.
 
         Parameters
@@ -144,29 +150,33 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
         f_id : the Buckets ID of the parameters, return False if nothing found.
         """
-        s = time.time()
-        # print(args)
-        d = self.db.Params.find_one(filter=args,sort=sort)
+        d = self.db.Params.find_one(filter=args, sort=sort)
 
         if d is not None:
             f_id = d['f_id']
         else:
             print("[TensorDB] Cannot find: {}".format(args))
             return False, False
-        # try:s
+
         s = time.time()
         d = self.paramsfs.get(f_id).read()
         print('get time', time.time()-s)
+
+        if lz4_decomp:
+            s = time.time()
+            d = decompress(d)
+            print('decomp time', time.time()-s)
+
         s = time.time()
         params = self.__deserialization(d)
+        print(len(params))
         print('deseri time', time.time()-s)
+
         print("[TensorDB] Find one params SUCCESS, {} took: {}s".format(args, round(time.time()-s, 2)))
         return params, f_id
-        # except:
-        #     return False, False
 
     @AutoFill
-    def find_all_params(self, args={}):
+    def find_all_params(self, args={}, lz4_decomp=False):
         """ Find all parameter from MongoDB Buckets
 
         Parameters
@@ -186,6 +196,8 @@ class TensorDB(object):
             params = []
             for f_id in f_id_list: # you may have multiple Buckets files
                 tmp = self.paramsfs.get(f_id).read()
+                if lz4_decomp:
+                    tmp = decompress(tmp)
                 params.append(self.__deserialization(tmp))
         else:
             print("[TensorDB] Cannot find: {}".format(args))

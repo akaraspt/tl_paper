@@ -117,7 +117,7 @@ with tf.Session() as sess:
 
                 print("[*] Generated {} examples".format(epx.shape[0]))
 
-                f_id = db.save_params([epx, epy, epr], args={'type': 'train_data'})  # , file_name='train_data')
+                f_id = db.save_params([epx, epy, epr], args={'type': 'train_data'}, lz4_comp=True)  # , file_name='train_data')
 
             # if episode_number % (batch_size * 100) == 0:
             #     tl.files.save_npz(net.all_params, name=model_file_name+'.npz')
@@ -135,10 +135,13 @@ with tf.Session() as sess:
                   ('' if reward == -1 else ' !!!!!!!!'))
             start_time = time.time()
 
-            if (episode_number % 1 == 0) and (game_number == 0):  ## Update model from Trainer
-                params, f = db.find_one_params(args={'type': 'network_parameters'})
-                if (params is not False):
-                    tl.files.assign_params(sess, params, net)
-                    print("[*] Update Model")
+            if (episode_number % 20 == 0) and (game_number == 0):  ## Update model from Trainer
+                try:
+                    params, f = db.find_one_params(args={'type': 'network_parameters'}, lz4_decomp=True)
+                    if (params is not False):
+                        tl.files.assign_params(sess, params, net)
+                        print("[*] Update Model")
+                except:
+                    pass
 
             game_number += 1

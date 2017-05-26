@@ -18,6 +18,7 @@ import tensorlayer as tl
 import gym
 import numpy as np
 import time
+
 # hyperparameters
 image_size = 80
 D = image_size * image_size
@@ -84,7 +85,7 @@ with tf.Session() as sess:
         is_found = False
         while is_found is False:
             ## read on
-            data, f_id = db.find_one_params(args={'type': 'train_data'})
+            data, f_id = db.find_one_params(args={'type': 'train_data'}, lz4_decomp=True)
             if (data is not False):
                 epx, epy, epr = data
                 db.del_params(args={'type': 'train_data', 'f_id': f_id})
@@ -123,4 +124,4 @@ with tf.Session() as sess:
 
         if n % 10 == 0:
             db.del_params(args={'type': 'network_parameters'})
-            db.save_params(sess.run(net.all_params), args={'type': 'network_parameters'})#, file_name='network_parameters')
+            db.save_params(sess.run(net.all_params), args={'type': 'network_parameters'}, lz4_comp=True)#, file_name='network_parameters')
