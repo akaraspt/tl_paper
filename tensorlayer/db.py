@@ -5,8 +5,6 @@ Experimental Database Management System.
 
 Latest Version
 """
-
-
 import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
@@ -32,10 +30,6 @@ def AutoFill(func):
     return func_wrapper
 
 
-
-
-
-
 class TensorDB(object):
     """TensorDB is a MongoDB based manager that help you to manage data, network topology, parameters and logging.
 
@@ -57,7 +51,7 @@ class TensorDB(object):
     db.TrainLog : Collection for
     db.ValidLog : Collection for
     db.TestLog : Collection for
-    studyID : string, unique ID, if None random generate one.
+    studyID : string or None, the unique study ID, if None random generate one.
 
     Dependencies
     -------------
@@ -77,14 +71,13 @@ class TensorDB(object):
         db_name = 'db_name',
         user_name = None,
         password = 'password',
-        studyID=None
+        studyID = None
     ):
         ## connect mongodb
         client = MongoClient(ip, port)
         self.db = client[db_name]
         if user_name != None:
             self.db.authenticate(user_name, password)
-
 
         if studyID is None:
             self.studyID=str(uuid.uuid1())
@@ -151,7 +144,6 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
         f_id : the Buckets ID of the parameters, return False if nothing found.
         """
-
         s = time.time()
         # print(args)
         d = self.db.Params.find_one(filter=args,sort=sort)
@@ -186,7 +178,6 @@ class TensorDB(object):
         params : the parameters, return False if nothing found.
 
         """
-
         s = time.time()
         pc = self.db.Params.find(args)
 
@@ -211,7 +202,6 @@ class TensorDB(object):
         -----------
         args : dictionary, find items to delete, leave it empty to delete all parameters.
         """
-
         pc = self.db.Params.find(args)
         f_id_list = pc.distinct('f_id')
         # remove from Buckets
@@ -223,8 +213,8 @@ class TensorDB(object):
         print("[TensorDB] Delete params SUCCESS: {}".format(args))
 
     def _print_dict(self, args):
+        """ """
         # return " / ".join(str(key) + ": "+ str(value) for key, value in args.items())
-
         string = ''
         for key, value in args.items():
             if key is not '_id':
@@ -244,7 +234,6 @@ class TensorDB(object):
         ---------
         >>> db.train_log(time=time.time(), {'loss': loss, 'acc': acc})
         """
-
         _result = self.db.TrainLog.insert_one(args)
         _log = self._print_dict(args)
         #print("[TensorDB] TrainLog: " +_log)
@@ -313,7 +302,7 @@ class TensorDB(object):
 
     @AutoFill
     def del_test_log(self, args={}):
-        """ Delete test log.
+        """Delete test log.
 
         Parameters
         -----------
@@ -326,6 +315,7 @@ class TensorDB(object):
     ## =========================== Network Architecture ================== ##
     @AutoFill
     def save_model_architecture(self,s,args={}):
+        """ """
         self.__autofill(args)
         fid=self.archfs.put(s,filename="modelarchitecture")
         args.update({"fid":fid})
@@ -333,7 +323,7 @@ class TensorDB(object):
 
     @AutoFill
     def load_model_architecture(self,args={}):
-
+        """ """
         d = self.db.march.find_one(args)
         if d is not None:
             fid = d['fid']
@@ -395,8 +385,6 @@ class TensorDB(object):
         --------
         dictionary : contains all meta data and script.
         """
-
-
         temp = self.db.Job.find_one(args)
 
         if temp is not None:
@@ -413,13 +401,12 @@ class TensorDB(object):
 
     @AutoFill
     def get_all_jobs(self, args={}):
-        """ Get all parameter from MongoDB Buckets
+        """ Get all parameter from MongoDB Buckets.
+
         Returns
         --------
         params : the parameters, return False if nothing found.
         """
-
-
         s = time.time()
         cursor = self.db.Job.find({})
 
@@ -435,14 +422,15 @@ class TensorDB(object):
         return jobs
 
     def push_job(self,margs, wargs,dargs,epoch):
-
-        ms,mid=self.load_model_architecture(margs)
-        weight,wid=self.find_one_params(wargs)
-        args={"weight":wid,"model":mid,"dargs":dargs,"epoch":epoch,"time":datetime.utcnow(),"Running":False}
+        """ """
+        ms, mid = self.load_model_architecture(margs)
+        weight, wid = self.find_one_params(wargs)
+        args = {"weight": wid, "model": mid, "dargs": dargs, "epoch": epoch, "time": datetime.utcnow(), "Running": False}
         self.__autofill(args)
         self.db.JOBS.insert_one(args)
 
     def peek_job(self):
+        """ """
         args={'Running':False}
         self.__autofill(args)
         m=self.db.JOBS.find_one(args)
@@ -458,9 +446,11 @@ class TensorDB(object):
         return m['_id'], ach,w,m["dargs"],m['epoch']
 
     def run_job(self,jid):
+        """ """
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Since":datetime.utcnow()}})
 
     def del_job(self,jid):
+        """ """
         self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Finished":datetime.utcnow()}})
 
     def __str__(self):
