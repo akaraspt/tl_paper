@@ -159,7 +159,7 @@ class TensorDB(object):
         if d is not None:
             f_id = d['f_id']
         else:
-            print("[TensorDB] FAIL! Cannot find: {}".format(args))
+            print("[TensorDB] Cannot find: {}".format(args))
             return False, False
         # try:s
         s = time.time()
@@ -197,7 +197,7 @@ class TensorDB(object):
                 tmp = self.paramsfs.get(f_id).read()
                 params.append(self.__deserialization(tmp))
         else:
-            print("[TensorDB] FAIL! Cannot find any: {}".format(args))
+            print("[TensorDB] Cannot find: {}".format(args))
             return False
 
         print("[TensorDB] Find all params SUCCESS, took: {}s".format(round(time.time()-s, 2)))
@@ -341,7 +341,7 @@ class TensorDB(object):
             print(fid)
             # "print find"
         else:
-            print("[TensorDB] FAIL! Cannot find: {}".format(args))
+            print("[TensorDB] Cannot find: {}".format(args))
             print ("no idtem")
             return False, False
         try:
@@ -406,7 +406,7 @@ class TensorDB(object):
                 f.close()
             print("[TensorDB] Find Job: {}".format(args))
         else:
-            print("[TensorDB] FAIL! Cannot find any: {}".format(args))
+            print("[TensorDB] Cannot find: {}".format(args))
             return False
 
         return temp
@@ -428,7 +428,7 @@ class TensorDB(object):
             for job in cursor: # you may have multiple Buckets files
                 jobs.append(job)
         else:
-            print("[TensorDB] FAIL! There is no job")
+            print("[TensorDB] There is no job")
             return False
 
         print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))

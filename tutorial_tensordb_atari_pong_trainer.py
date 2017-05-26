@@ -110,7 +110,6 @@ with tf.Session() as sess:
         disR -= np.mean(disR)
         disR /= np.std(disR)
 
-        # for X_val_a, y_vals_a in tl.iterate.minibatches(X_val, y_val, batch_size, shuffle=True):
         sess.run(train_op,{
                 states_batch_pl: epx,
                 actions_batch_pl: epy,
