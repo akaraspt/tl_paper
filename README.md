@@ -36,8 +36,14 @@ For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-valid
 * Hi Akara, if this part is in another repo, please link it
 
 ## Generative Adversarial Network
-* Please check [Text to image synthesis](https://github.com/zsdonghao/text-to-image)
+* DCGAN
+  * [TensorFlow Implementation](https://github.com/carpedm20/DCGAN-tensorflow)
+  * [TensorLayer Implementation](https://github.com/zsdonghao/dcgan)
+* Text to image synthesis
+  * [TensorFlow Implementation](https://github.com/paarthneekhara/text-to-image)
+  * [TensorLayer Implementation](https://github.com/zsdonghao/text-to-image)
 
+  
 ## More
 * [Documentation](http://tensorlayer.readthedocs.io)
 * [Examples and Applications](http://tensorlayer.readthedocs.io/en/latest/user/example.html)
