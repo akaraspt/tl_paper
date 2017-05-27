@@ -1,4 +1,5 @@
 # Codes for ACM MM Open Source Software Competition
+This repo summarize the codes that mention in "Efficient Deep Learning Development Using TensorLayer".
 
 ## Setup Environment
 * TensorFlow 1.0
@@ -15,7 +16,7 @@
   * `pip install gym[atari]` or `pip install gym[all]` 
 
 ## Raw Performance
-* Run this experiment in solo mode.
+This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
 * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
 * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) (5x faster, optimize CPU/GPU operation, tested on Titan X Pascal)
 
@@ -26,18 +27,26 @@ For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-valid
 * xx
 
 ## Deep Reinforcement Learning
-* [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
-* [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
+This is a simple asynchronous DRL example.
+* About the codes
+  * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
+  * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
 * Run the experiment
-  * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
+  * Before you run it in distributed mode, we higly recommend you to run one trainer with multiple data generators in a standalone machine.
   * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
 
 ## Hyper-parameter selection and cross-validation
 * Hi Akara, if this part is in another repo, please link it
 
 ## Generative Adversarial Network
-* Please check [Text to image synthesis](https://github.com/zsdonghao/text-to-image)
+* DCGAN
+  * [TensorFlow Implementation](https://github.com/carpedm20/DCGAN-tensorflow)
+  * [TensorLayer Implementation](https://github.com/zsdonghao/dcgan)
+* Text to image synthesis
+  * [TensorFlow Implementation](https://github.com/paarthneekhara/text-to-image)
+  * [TensorLayer Implementation](https://github.com/zsdonghao/text-to-image)
 
+  
 ## More
 * [Documentation](http://tensorlayer.readthedocs.io)
 * [Examples and Applications](http://tensorlayer.readthedocs.io/en/latest/user/example.html)
