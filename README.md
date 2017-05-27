@@ -29,7 +29,7 @@ For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-valid
 * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
 * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
 * Run the experiment
-  * To have a quick test, you can run multiple data generators and one trainer in a standalone machine.
+  * Before you run it in distributed mode, we higly recommend you to run one trainer with multiple data generators in a standalone machine.
   * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
 
 ## Hyper-parameter selection and cross-validation
