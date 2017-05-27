@@ -15,7 +15,7 @@
   * `pip install gym[atari]` or `pip install gym[all]` 
 
 ## Raw Performance
-* Run this experiment in solo mode.
+This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
 * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
 * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) (5x faster, optimize CPU/GPU operation, tested on Titan X Pascal)
 
