@@ -26,6 +26,7 @@ For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-valid
 * xx
 
 ## Deep Reinforcement Learning
+This is a simple asynchronous DRL example.
 * About the codes
   * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
   * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
