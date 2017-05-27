@@ -22,6 +22,15 @@ from datetime import datetime
 
 import inspect
 
+
+class JobStatus(object):
+    WAITING = "waiting"
+    RUNNING = "running"
+    FINISHED = "finished"
+    FAILED = "failed"
+    TERMINATED = "terminated"
+
+
 def AutoFill(func):
     def func_wrapper(self,*args,**kwargs):
         d=inspect.getcallargs(func,self,*args,**kwargs)
@@ -355,73 +364,61 @@ class TensorDB(object):
             return False, False
 
     @AutoFill
-    def save_job(self, script=None, args={}):
-        """ Save customized job.
+    def submit_job(self, args={}, allow_duplicate=True):
+        """ Submit a job.
 
         Parameters
         -----------
-        script : a script file name or None.
-        args : dictionary, items to save.
 
         Examples
         ---------
-        >>> # Save your job
-        >>> db.save_job('your_script.py', {'job_id': 1, 'learning_rate': 0.01, 'n_units': 100})
-        >>> # Run your job
-        >>> temp = db.find_one_job(args={'job_id': 1})
-        >>> print(temp['learning_rate'])
-        ... 0.01
-        >>> import _your_script
-        ... running your script
         """
         self.__autofill(args)
-        if script is not None:
-            _script = open(script, 'rb').read()
-            args.update({'script': _script, 'script_name': script})
-        # _result = self.db.Job.insert_one(args)
-        _result = self.db.Job.replace_one(args, args, upsert=True)
+        args.update({
+            'status': JobStatus.WAITING,
+            "datetime": datetime.utcnow(),
+        })
+        if allow_duplicate:
+            _result = self.db.Job.insert_one(args)
+        else:
+            _result = self.db.Job.replace_one(args, args, upsert=True)
         _log = self._print_dict(args)
-        print("[TensorDB] Save Job: script={}, args={}".format(script, args))
+        print("[TensorDB] Submit Job: args={}".format(args))
         return _result
 
-    @AutoFill
-    def find_one_job(self, args={}):
-        """ Find one job from MongoDB Job Collections.
+    def get_job(self, job_id):
+        """ Get jobs.
 
         Parameters
-        ----------
-        args : dictionary, find items.
+        -----------
 
-        Returns
-        --------
-        dictionary : contains all meta data and script.
+        Examples
+        ---------
         """
-        temp = self.db.Job.find_one(args)
+        job = self.db.Job.find_one({"_id": job_id})
 
-        if temp is not None:
-            if 'script_name' in temp.keys():
-                f = open('_' + temp['script_name'], 'wb')
-                f.write(temp['script'])
-                f.close()
-            print("[TensorDB] Find Job: {}".format(args))
-        else:
-            print("[TensorDB] Cannot find: {}".format(args))
+        if job is None:
+            print("[TensorDB] Cannot find any job with id: {}".format(job_id))
             return False
+        else:
+            return job
 
-        return temp
+    def get_jobs(self, status=None):
+        """ Get jobs.
 
-    @AutoFill
-    def get_all_jobs(self, args={}):
-        """ Get all parameter from MongoDB Buckets.
+        Parameters
+        -----------
 
-        Returns
-        --------
-        params : the parameters, return False if nothing found.
+        Examples
+        ---------
         """
-        s = time.time()
-        cursor = self.db.Job.find({})
-
         jobs = []
+
+        if status is None:
+            cursor = self.db.Job.find({})
+        else:
+            cursor = self.db.Job.find({'status': status})
+
         if cursor is not None:
             for job in cursor: # you may have multiple Buckets files
                 jobs.append(job)
@@ -429,40 +426,146 @@ class TensorDB(object):
             print("[TensorDB] There is no job")
             return False
 
-        print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))
+        print("[TensorDB] Get jobs with status:{} SUCCESS".format(status))
         return jobs
 
-    def push_job(self, margs, wargs ,dargs, epoch):
-        """ Generate a new job. """
-        ms, mid = self.load_model_architecture(margs)
-        weight, wid = self.find_one_params(wargs)
-        args = {"weight": wid, "model": mid, "dargs": dargs, "epoch": epoch, "time": datetime.utcnow(), "Running": False}
-        self.__autofill(args)
-        self.db.JOBS.insert_one(args)
+    def change_job_status(self, job_id, status):
+        """ Change the status of a job.
 
-    def peek_job(self):
-        """ Check whether a job exists. """
-        args={'Running':False}
-        self.__autofill(args)
-        m=self.db.JOBS.find_one(args)
-        print(m)
-        if m is None:
+        Parameters
+        -----------
+
+        Examples
+        ---------
+        """
+        job = self.db.Job.find_one({"_id": job_id})
+
+        if job is None:
+            print("[TensorDB] Cannot find any job with id: {}".format(job_id))
             return False
+        else:
+            _result = self.db.Job.update(
+                {'_id': job_id},
+                {
+                    '$set': {
+                        'status': status, 
+                        "datetime": datetime.utcnow()
+                    }
+                }, upsert=False, multi=False
+            )
+            print("[TensorDB] Change the status of job ({}) to: {}".format(job_id, status))
+            return _result
 
-        s=self.paramsfs.get(m['weight']).read()
-        w=self.__deserialization(s)
 
-        ach=self.archfs.get(m['model']).read()
+    # @AutoFill
+    # def save_job(self, script=None, args={}):
+    #     """ Save customized job.
 
-        return m['_id'], ach,w,m["dargs"],m['epoch']
+    #     Parameters
+    #     -----------
+    #     script : a script file name or None.
+    #     args : dictionary, items to save.
 
-    def run_job(self,jid):
-        """ Set a job as running. """
-        self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Since":datetime.utcnow()}})
+    #     Examples
+    #     ---------
+    #     >>> # Save your job
+    #     >>> db.save_job('your_script.py', {'job_id': 1, 'learning_rate': 0.01, 'n_units': 100})
+    #     >>> # Run your job
+    #     >>> temp = db.find_one_job(args={'job_id': 1})
+    #     >>> print(temp['learning_rate'])
+    #     ... 0.01
+    #     >>> import _your_script
+    #     ... running your script
+    #     """
+    #     self.__autofill(args)
+    #     if script is not None:
+    #         _script = open(script, 'rb').read()
+    #         args.update({'script': _script, 'script_name': script})
+    #     # _result = self.db.Job.insert_one(args)
+    #     _result = self.db.Job.replace_one(args, args, upsert=True)
+    #     _log = self._print_dict(args)
+    #     print("[TensorDB] Save Job: script={}, args={}".format(script, args))
+    #     return _result
 
-    def del_job(self,jid):
-        """ Set a job as finished. """
-        self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Finished":datetime.utcnow()}})
+    # @AutoFill
+    # def find_one_job(self, args={}):
+    #     """ Find one job from MongoDB Job Collections.
+
+    #     Parameters
+    #     ----------
+    #     args : dictionary, find items.
+
+    #     Returns
+    #     --------
+    #     dictionary : contains all meta data and script.
+    #     """
+    #     temp = self.db.Job.find_one(args)
+
+    #     if temp is not None:
+    #         if 'script_name' in temp.keys():
+    #             f = open('_' + temp['script_name'], 'wb')
+    #             f.write(temp['script'])
+    #             f.close()
+    #         print("[TensorDB] Find Job: {}".format(args))
+    #     else:
+    #         print("[TensorDB] Cannot find: {}".format(args))
+    #         return False
+
+    #     return temp
+
+    # @AutoFill
+    # def get_all_jobs(self, args={}):
+    #     """ Get all parameter from MongoDB Buckets.
+
+    #     Returns
+    #     --------
+    #     params : the parameters, return False if nothing found.
+    #     """
+    #     s = time.time()
+    #     cursor = self.db.Job.find({})
+
+    #     jobs = []
+    #     if cursor is not None:
+    #         for job in cursor: # you may have multiple Buckets files
+    #             jobs.append(job)
+    #     else:
+    #         print("[TensorDB] There is no job")
+    #         return False
+
+    #     print("[TensorDB] Get all jobs SUCCESS, took: {}s".format(round(time.time()-s, 2)))
+    #     return jobs
+
+    # def push_job(self, margs, wargs ,dargs, epoch):
+    #     """ Generate a new job. """
+    #     ms, mid = self.load_model_architecture(margs)
+    #     weight, wid = self.find_one_params(wargs)
+    #     args = {"weight": wid, "model": mid, "dargs": dargs, "epoch": epoch, "time": datetime.utcnow(), "Running": False}
+    #     self.__autofill(args)
+    #     self.db.JOBS.insert_one(args)
+
+    # def peek_job(self):
+    #     """ Check whether a job exists. """
+    #     args={'Running':False}
+    #     self.__autofill(args)
+    #     m=self.db.JOBS.find_one(args)
+    #     print(m)
+    #     if m is None:
+    #         return False
+
+    #     s=self.paramsfs.get(m['weight']).read()
+    #     w=self.__deserialization(s)
+
+    #     ach=self.archfs.get(m['model']).read()
+
+    #     return m['_id'], ach,w,m["dargs"],m['epoch']
+
+    # def run_job(self,jid):
+    #     """ Set a job as running. """
+    #     self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Since":datetime.utcnow()}})
+
+    # def del_job(self,jid):
+    #     """ Set a job as finished. """
+    #     self.db.JOBS.find_one_and_update({'_id':jid},{'$set': {'Running': True,"Finished":datetime.utcnow()}})
 
     def __str__(self):
         _s = "[TensorDB] Info:\n"
