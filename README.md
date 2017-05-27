@@ -1,4 +1,5 @@
 # Codes for ACM MM Open Source Software Competition
+This repo summarize the codes that mention in "Efficient Deep Learning Development Using TensorLayer".
 
 ## Setup Environment
 * TensorFlow 1.0
