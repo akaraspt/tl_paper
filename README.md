@@ -35,7 +35,7 @@ This a raw performance comparsion between TensorLayer and original TensorFlow en
   * [TensorLayer Implementation](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_word2vec_basic.py)
 
 ## Deep Reinforcement Learning
-This is a simple asynchronous DRL example.
+This is a simple asynchronous DRL example, you can run this example in one machine or multiple machines with database module.
 * About the codes
   * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
   * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
