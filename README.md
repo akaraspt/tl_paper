@@ -20,7 +20,7 @@ Before you start, you need to set up the environment for all examples in this re
     * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
     * We recommend to use one machine as database server.
   * Install eAE (Optional)
-    * You may need this tool to distribute xxxx ⚠️
+    * You may need this tool to distribute xxxx ⚠️
 
 ## Raw Performance
 This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
