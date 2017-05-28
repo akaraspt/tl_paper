@@ -10,7 +10,7 @@ Before you start, you need to set up the environment for all examples in this re
     * It is self-contained
     * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
 * Deep Reinforcement Learning
-  * To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) and [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html).
+  * To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) for game environment, [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html) for data compression and the database module.
   * `pip install gym lz4`
   * `sudo apt-get install swig cmake`
   * `pip install gym[atari]` or `pip install gym[all]`
