@@ -1,8 +1,9 @@
 # Codes for ACM MM Open Source Software Competition
 This repo summarize the codes that mention in "Efficient Deep Learning Development Using TensorLayer".
 
-## Setup Environment
-* TensorFlow 1.0
+## Set up Environment
+Before you start, you need to set up the environment for all examples in this repo.
+* TensorFlow 1.0+
   * `pip install tensorflow-gpu`
 * TensorLayer 
   * It is self-contained
