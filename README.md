@@ -1,23 +1,26 @@
 # Codes for ACM MM Open Source Software Competition
 This repo summarize the codes that mention in "Efficient Deep Learning Development Using TensorLayer".
 
-## Set up Environment
+## Set Up Environment
 Before you start, you need to set up the environment for all examples in this repo.
-* Deep Learning Engine
+* Layer Module
   * TensorFlow 1.0+
     * `pip install tensorflow-gpu`
   * TensorLayer 
     * It is self-contained
     * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
-* Database Module
-  * Install Database
-    * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
-    * We recommend to use one machine as database server.
 * Deep Reinforcement Learning
 To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) and [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html).
   * `pip install gym lz4`
   * `sudo apt-get install swig cmake`
-  * `pip install gym[atari]` or `pip install gym[all]` 
+  * `pip install gym[atari]` or `pip install gym[all]`
+* Database Module
+For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use dataset and workflow modules.
+  * Install MongoDB
+    * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
+    * We recommend to use one machine as database server.
+  * Install eAE (Optional)
+    * xxx ⚠️
 
 ## Raw Performance
 This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
@@ -31,12 +34,6 @@ This a raw performance comparsion between TensorLayer and original TensorFlow en
   * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/word2vec)
   * [TensorLayer Implementation](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_word2vec_basic.py)
 
-## Start Workers
-For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use distributed mode.
-* Install MongoDB in one machine, setup environment in all other machines.
-* xx
-* xx
-
 ## Deep Reinforcement Learning
 This is a simple asynchronous DRL example.
 * About the codes
@@ -47,7 +44,7 @@ This is a simple asynchronous DRL example.
   * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
 
 ## Hyper-parameter selection and cross-validation
-* Hi Akara, if this part is in another repo, please link it
+* xxx ⚠️Hi Akara, if this part is in another repo, please link it
 
 ## Generative Adversarial Network
 * DCGAN
