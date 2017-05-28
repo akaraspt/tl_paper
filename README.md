@@ -24,7 +24,7 @@ Before you start, you need to set up the environment for all examples in this re
     * You may need this tool to distribute xxxx ⚠️
 
 ## Raw Performance
-This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
+You only need to install TensorFlow to run these examples. This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
 * CIFAR-10 classification
   * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
   * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) (5x faster, optimize CPU/GPU operation, tested on Titan X Pascal)
@@ -36,6 +36,7 @@ This a raw performance comparsion between TensorLayer and original TensorFlow en
   * [TensorLayer Implementation](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_word2vec_basic.py)
 
 ## Deep Reinforcement Learning
+You need to install all modules to run this example.
 This is a simple asynchronous DRL example, you can run this example in one machine or multiple machines with database module.
 * About the codes
   * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
@@ -51,9 +52,11 @@ This is a simple asynchronous DRL example, you can run this example in one machi
       * xx
 
 ## Hyper-parameter selection and cross-validation
+You need to install all modules to run this example.
 * xxx ⚠️Hi Akara, if this part is in another repo, please link it
 
 ## Generative Adversarial Network
+You only need to install TensorFlow to run these examples.
 * DCGAN
   * [TensorFlow Implementation](https://github.com/carpedm20/DCGAN-tensorflow)
   * [TensorLayer Implementation](https://github.com/zsdonghao/dcgan)
