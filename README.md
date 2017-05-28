@@ -6,7 +6,7 @@ Before you start, you need to set up the environment for all examples in this re
 * Layer Module
   * This is the basic module of TensorLayer, you can run all [single machine examples](http://tensorlayer.readthedocs.io/en/latest/user/example.html) with this module only.
   * TensorFlow 1.0+
-    * `pip install tensorflow-gpu`
+    * `pip install tensorflow-gpu` and follow [the official installation guide](https://www.tensorflow.org/install/)
   * TensorLayer 
     * It is self-contained
     * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
