@@ -15,7 +15,7 @@ Before you start, you need to set up the environment for all examples in this re
   * `sudo apt-get install swig cmake`
   * `pip install gym[atari]` or `pip install gym[all]`
 * Database Module
-   * For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use dataset and workflow modules.
+  * For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use dataset and workflow modules.
   * Install MongoDB
     * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
     * We recommend to use one machine as database server.
