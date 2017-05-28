@@ -44,16 +44,16 @@ This is a simple asynchronous DRL example, you can run this example in one machi
 * Run the experiment
   * Before you run it in distributed mode, we higly recommend you to run one trainer with multiple data generators in a standalone machine.
   * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
-    * Start
-      * xxx
-    * Monitor
-      * xx
-    * Terminate
-      * xx
+    * Start multiple agents that generate training samples for the trainer. Run the following script uses to start multiple generators. Note: all of the generated data will be stored in MongoDB, which will be fetched by the training
+      *  `python submit_job_eae.py`
+    * After start the generators, run the following script to train a model.
+      * `python tutorial_tensordb_atari_pong_trainer.py`
+    * To terminate all of the generators, run the following scripts.
+      * `python terminate_running_jobs.py`
 
 ## Hyper-parameter selection and cross-validation
 You need to install all modules to run this example.
-* xxx ⚠️Hi Akara, if this part is in another repo, please link it
+* [DeepSleepNet](https://github.com/akaraspt/deepsleepnet)
 
 ## Generative Adversarial Network
 You only need to install TensorFlow to run these examples.
