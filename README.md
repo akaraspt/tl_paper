@@ -3,16 +3,19 @@ This repo summarize the codes that mention in "Efficient Deep Learning Developme
 
 ## Set up Environment
 Before you start, you need to set up the environment for all examples in this repo.
-* TensorFlow 1.0+
-  * `pip install tensorflow-gpu`
-* TensorLayer 
-  * It is self-contained
-  * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
-* Install Database
-  * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
-  * We recommend to use one machine as database server.
-* Python packages
-  * `pip install pymongo gym numpy matplotlib scipy scikit-image lz4`
+* Deep Learning Engine
+  * TensorFlow 1.0+
+    * `pip install tensorflow-gpu`
+  * TensorLayer 
+    * It is self-contained
+    * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
+* Database Module
+  * Install Database
+    * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
+    * We recommend to use one machine as database server.
+* Deep Reinforcement Learning
+To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) and [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html).
+  * `pip install gym lz4`
   * `sudo apt-get install swig cmake`
   * `pip install gym[atari]` or `pip install gym[all]` 
 
