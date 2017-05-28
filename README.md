@@ -27,7 +27,7 @@ This a raw performance comparsion between TensorLayer and original TensorFlow en
 * CIFAR-10 classification
   * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/deep_cnn)
   * [TensorLayer Implementation](https://github.com/akaraspt/tl_paper/blob/master/cifar10.py), [Optimized Version](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_cifar10_tfrecord.py) (5x faster, optimize CPU/GPU operation, tested on Titan X Pascal)
-* PTB Language Modelling
+* PTB Language modelling
   * [TensorFlow Implementation](https://www.tensorflow.org/tutorials/recurrent)
   * [TensorLayer Implementation](https://github.com/zsdonghao/tensorlayer/blob/master/example/tutorial_ptb_lstm_state_is_tuple.py)
 * Word2vec
