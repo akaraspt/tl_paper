@@ -4,6 +4,7 @@ This repo summarize the codes that mention in "Efficient Deep Learning Developme
 ## Set Up Environment
 Before you start, you need to set up the environment for all examples in this repo.
 * Layer Module
+  * This is the basic module of TensorLayer, you can run all [single machine examples](http://tensorlayer.readthedocs.io/en/latest/user/example.html) with this module only.
   * TensorFlow 1.0+
     * `pip install tensorflow-gpu`
   * TensorLayer 
