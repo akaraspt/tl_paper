@@ -3,8 +3,8 @@ This repo summarize the codes that mention in "TensorLayer: XXXXXXXX ⚠️".
 
 ## Set Up Environment
 Before you start, you need to set up the environment for all examples in this repo.
-* Layer Module
-  * This is the basic module of TensorLayer, you can run all [single machine examples](http://tensorlayer.readthedocs.io/en/latest/user/example.html) with this module only.
+* Layer and Model Modules
+  * This is the basic module of TensorLayer, you can run all [single machine examples](http://tensorlayer.readthedocs.io/en/latest/user/example.html) with this module only.
   * TensorFlow 1.0+
     * `pip install tensorflow-gpu` or follow [the official installation guide](https://www.tensorflow.org/install/)
   * TensorLayer 
@@ -15,7 +15,7 @@ Before you start, you need to set up the environment for all examples in this re
   * `pip install gym lz4`
   * `sudo apt-get install swig cmake`
   * `pip install gym[atari]` or `pip install gym[all]`
-* Database and Workflow Module
+* Database and Workflow Modules
   * For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use dataset and workflow modules.
   * Install MongoDB
     * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
