@@ -42,6 +42,12 @@ This is a simple asynchronous DRL example, you can run this example in one machi
 * Run the experiment
   * Before you run it in distributed mode, we higly recommend you to run one trainer with multiple data generators in a standalone machine.
   * For distributed mode, one machine run one trainer with GPU, all other machines run data generator.
+    * Start
+      * xxx
+    * Monitor
+      * xx
+    * Terminate
+      * xx
 
 ## Hyper-parameter selection and cross-validation
 * xxx ⚠️Hi Akara, if this part is in another repo, please link it
