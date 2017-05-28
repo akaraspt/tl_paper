@@ -1,5 +1,5 @@
 # Codes for ACM MM Open Source Software Competition
-This repo summarize the codes that mention in "Efficient Deep Learning Development Using TensorLayer".
+This repo summarize the codes that mention in "TensorLayer: XXXXXXXX ⚠️".
 
 ## Set Up Environment
 Before you start, you need to set up the environment for all examples in this repo.
