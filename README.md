@@ -21,7 +21,7 @@ Before you start, you need to set up the environment for all examples in this re
     * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
     * We recommend to use one machine as database server.
   * Install eAE (Optional)
-    * You may need this tool to distribute xxxx ⚠️
+    * You may need this environement to distribute the different jobs. An installation process is available at that address: https://github.com/aoehmichen/eae-docker/blob/master/install_eae_hybrid.txt 
 
 ## Raw Performance
 You only need to install TensorFlow to run these examples. This a raw performance comparsion between TensorLayer and original TensorFlow engine, to prove TensorLayer's simplicity would not sacrifice the performance.
