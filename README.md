@@ -11,15 +11,15 @@ Before you start, you need to set up the environment for all examples in this re
     * It is self-contained
     * You can also get the latest version in [Github](https://github.com/zsdonghao/tensorlayer)
 * Deep Reinforcement Learning Environment
-  * To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) for game environment, [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html) for data compression and the database module.
+  * To run the DRL example, you will need to install [OpenAI gym](https://gym.openai.com) for game environment, [lz4](http://python-lz4.readthedocs.io/en/latest/quickstart.html) for data compression and the dataset module.
   * `pip install gym lz4`
   * `sudo apt-get install swig cmake`
   * `pip install gym[atari]` or `pip install gym[all]`
-* Database and Workflow Modules
+* Dataset and Workflow Modules
   * For `Deep Reinforcement Learning` and `Hyper-parameter selection and cross-validation` you may want to use dataset and workflow modules.
   * Install MongoDB
     * Follow [MongoDB docs](https://docs.mongodb.com/manual/installation/)
-    * We recommend to use one machine as database server.
+    * We recommend to use one machine as dataset server.
   * Install eAE (Optional)
     * You may need this environement to distribute the different jobs. An installation process is available at that address: https://github.com/aoehmichen/eae-docker/blob/master/install_eae_hybrid.txt 
 
@@ -37,7 +37,7 @@ You only need to install TensorFlow to run these examples. This a raw performanc
 
 ## Deep Reinforcement Learning
 You need to install all modules to run this example.
-This is a simple asynchronous DRL example, you can run this example in one machine or multiple machines with database module.
+This is a simple asynchronous DRL example, you can run this example in one machine or multiple machines with dataset module.
 * About the codes
   * [tutorial_tensordb_atari_pong_generator.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_generator.py) is the data generator.
   * [tutorial_tensordb_atari_pong_trainer.py](https://github.com/akaraspt/tl_paper/blob/master/tutorial_tensordb_atari_pong_trainer.py) is the GPU trainer.
