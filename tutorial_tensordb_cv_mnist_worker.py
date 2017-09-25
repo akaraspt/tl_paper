@@ -239,7 +239,9 @@ def load_mnist_data(db, shape=(-1, 28, 28, 1)):
 
 
 def worker(job_id):
-    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour', studyID="MNIST")
+    # This is to initialize the connection to your MondonDB server
+    # Note: make sure your MongoDB is reachable before changing this line
+    db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='ANY_ID (e.g., mnist)')
 
     from bson.objectid import ObjectId
     job = db.find_one_job(args={'_id': ObjectId(job_id)})

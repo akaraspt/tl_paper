@@ -36,7 +36,7 @@ from tensorlayer.db import TensorDB
 
 # This is to initialize the connection to your MondonDB server
 # Note: make sure your MongoDB is reachable before changing this line
-db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='1')
+db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='ANY_ID (e.g., mnist)')
 
 # def prepro(I):
 #     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """

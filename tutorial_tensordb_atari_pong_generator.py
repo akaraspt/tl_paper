@@ -26,9 +26,9 @@ os.environ["CUDA_VISIBLE_DEVICES"]=""  # CPU
 from tensorlayer.db import TensorDB
 from tensorlayer.db import JobStatus
 
-# db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-# db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123', studyID='1')
-db = TensorDB(ip='146.169.15.140', port=27017, db_name='DRL', user_name=None, password=None, studyID='1')
+# This is to initialize the connection to your MondonDB server
+# Note: make sure your MongoDB is reachable before changing this line
+db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='ANY_ID (e.g., mnist)')
 
 
 def main(args):

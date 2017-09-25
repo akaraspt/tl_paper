@@ -63,7 +63,10 @@ def start_workers(db):
 
 
 def main():
-    db = TensorDB(ip='146.169.33.34', port=27020, db_name='TransferGan', user_name='akara', password='DSIGPUfour', studyID="MNIST")
+    # This is to initialize the connection to your MondonDB server
+    # Note: make sure your MongoDB is reachable before changing this line
+    db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='ANY_ID (e.g., mnist)')
+
     create_mnist_dataset(db=db)
     create_jobs(db=db, job_name="cv_mnist", models_dict={
         "cnn": {
@@ -80,7 +83,7 @@ def main():
     })
 
     # Setting up the connection to interface
-    ip = "interfaceeae.doc.ic.ac.uk"
+    ip = "IP_ADDRESS_OF_EAE (e.g., interfaceeae.doc.ic.ac.uk)"
     port = 443
     eae = eAE(ip, port)
 
@@ -95,12 +98,12 @@ def main():
 
     # We submit a dummy job
     parameters_set = "\n".join(args)
-    cluster = "gpu_dev"
-    computation_type = "GPU"
-    main_file = "/home/akara/Workspace/tl_paper/tutorial_tensordb_cv_mnist_worker.py"
-    data_files = ['/home/akara/Workspace/tl_paper/tensorlayer']
-    host_ip = "dsihuaweiroom.doc.ic.ac.uk"
-    ssh_port = "22"
+    cluster = "NAME_OF_CLUSTER (e.g., gpu_dev)"
+    computation_type = "COMPUTATION_TYPE (e.g., GPU)"
+    main_file = "ABSOLUTE_PATH_TO_MAIN_FILE"
+    data_files = ['ABSOLUTE_PATH_TO_DIRECTORY_OR_FILES_TO_BE_COPIED_TO_RUN_THE_MAIN_FILE']
+    host_ip = "IP_ADDRESS_OF_HOST_MACHINE_RUNNING_THIS_SCRIPT"
+    ssh_port = "SSH_PORT_OF_HOST_MACHINE"
     job = eae.submit_jobs(parameters_set, cluster, computation_type, main_file, data_files, host_ip, ssh_port)
     print(job)
 
