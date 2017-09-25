@@ -33,9 +33,10 @@ decay_rate = 0.99
 np.set_printoptions(threshold=np.nan)
 
 from tensorlayer.db import TensorDB
-# db = TensorDB(ip='localhost', port=27017, db_name='atari', user_name=None, password=None) #<- if none password
-# db = TensorDB(ip='146.169.33.34', port=27020, db_name='DRL', user_name='tensorlayer', password='Tensorlayer123', studyID='1')
-db = TensorDB(ip='146.169.15.140', port=27017, db_name='DRL', user_name=None, password=None, studyID='1')
+
+# This is to initialize the connection to your MondonDB server
+# Note: make sure your MongoDB is reachable before changing this line
+db = TensorDB(ip='IP_ADDRESS_OR_YOUR_MONGODB', port=27017, db_name='DATABASE_NAME', user_name=None, password=None, studyID='1')
 
 # def prepro(I):
 #     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
